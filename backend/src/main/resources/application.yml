@@ -1,0 +1,133 @@
+# Application Configuration
+spring:
+  application:
+    name: job-monitoring-tool
+
+  # Database Configuration (SQLite)
+  datasource:
+    url: jdbc:sqlite:./data/jobmonitor.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      connection-test-query: SELECT 1
+      maximum-pool-size: 10
+      minimum-idle: 5
+
+  # JPA Configuration  
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+        show_sql: false
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+
+  # Flyway Migration
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  # Security
+  security:
+    jwt:
+      secret: ${JWT_SECRET:mySecretKey1234567890123456789012345678901234567890}
+      access-token-validity: 900000 # 15 minutes
+      refresh-token-validity: 604800000 # 7 days
+
+  # Web Configuration
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  # Actuator
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus
+    endpoint:
+      health:
+        show-details: when_authorized
+
+# Logging Configuration
+logging:
+  level:
+    com.company.jobmonitor: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# Application Specific Configuration
+app:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    max-age: 3600
+
+  admin:
+    default-username: admin
+    default-password: admin123
+    default-email: admin@jobmonitor.com
+
+  job-import:
+    csv:
+      upload-dir: ./data/uploads
+      max-file-size: 10MB
+    schedule:
+      enabled: true
+      cron: "0 */5 * * * *" # Every 5 minutes
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+
+  devtools:
+    restart:
+      enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        show_sql: false
+
+logging:
+  level:
+    root: INFO
+    com.company.jobmonitor: INFO
