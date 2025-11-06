@@ -22,7 +22,17 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# Frontend Build Output
 frontend/node/*
 frontend/node_modules/*
 frontend/dist/*
+
+# Backend Build Output
 backend/target/*
+
+# Generated Frontend Files in Backend (DO NOT COMMIT)
+backend/src/main/resources/static/*
+
+# Database Files
+backend/data/jobmonitor.db
