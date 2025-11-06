@@ -1,0 +1,57 @@
+# This file controls the behavior of Trunk: https://docs.trunk.io/cli
+# To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
+version: 0.1
+cli:
+  version: 1.25.0
+# Trunk provides extensibility via plugins. (https://docs.trunk.io/plugins)
+plugins:
+  sources:
+  - id: trunk
+    ref: v1.7.3
+    uri: https://github.com/trunk-io/plugins
+# Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
+runtimes:
+  enabled:
+  - node@18.18.0
+  - java@openjdk-11
+
+# This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
+lint:
+  enabled:
+  # Java
+  - google-java-format@1.18.1
+  - pmd@6.55.0
+
+  # TypeScript/JavaScript
+  - eslint@8.54.0
+  - prettier@3.1.0
+
+  # General
+  - git-diff-check
+  - gitleaks@8.18.0
+  - markdownlint@0.37.0
+  - oxipng@9.0.0
+  - svgo@3.0.5
+
+  # YAML/JSON
+  - yamllint@1.33.0
+
+  ignore:
+  - linters: [ ALL ]
+    paths:
+    - "**/target/**"
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/.trunk/**"
+    - "**/src/main/resources/static/**"
+
+actions:
+  enabled:
+  - trunk-announce
+  - trunk-check-pre-push
+  - trunk-fmt-pre-commit
+  - trunk-upgrade-available
+
+merge:
+  required_statuses:
+  - Trunk Check
