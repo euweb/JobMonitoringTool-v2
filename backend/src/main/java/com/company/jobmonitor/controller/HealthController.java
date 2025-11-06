@@ -8,18 +8,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class HealthController {
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello from Job Monitor API!";
-    }
+  @GetMapping("/hello")
+  public String hello() {
+    return "Hello from Job Monitor API!";
+  }
 
-    @GetMapping("/status")
-    public String status() {
-        return "Job Monitor is running successfully!";
-    }
+  @GetMapping("/status")
+  public String status() {
+    return "Job Monitor is running successfully!";
+  }
 
-    @GetMapping("/health")
-    public String health() {
-        return "OK - Application is healthy";
-    }
+  @GetMapping("/health")
+  public String health() {
+    return "OK - Application is healthy";
+  }
 }

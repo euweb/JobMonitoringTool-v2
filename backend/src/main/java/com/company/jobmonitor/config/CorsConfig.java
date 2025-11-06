@@ -8,25 +8,26 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
-    @Value("${app.cors.allowed-origins}")
-    private String[] allowedOrigins;
+  @Value("${app.cors.allowed-origins}")
+  private String[] allowedOrigins;
 
-    @Value("${app.cors.allowed-methods}")
-    private String[] allowedMethods;
+  @Value("${app.cors.allowed-methods}")
+  private String[] allowedMethods;
 
-    @Value("${app.cors.allowed-headers}")
-    private String allowedHeaders;
+  @Value("${app.cors.allowed-headers}")
+  private String allowedHeaders;
 
-    @Value("${app.cors.max-age}")
-    private long maxAge;
+  @Value("${app.cors.max-age}")
+  private long maxAge;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(false)
-                .maxAge(3600);
-    }
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry
+        .addMapping("/**")
+        .allowedOriginPatterns("*")
+        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        .allowedHeaders("*")
+        .allowCredentials(false)
+        .maxAge(3600);
+  }
 }

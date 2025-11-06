@@ -12,7 +12,7 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
 
-  # JPA Configuration  
+  # JPA Configuration
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
