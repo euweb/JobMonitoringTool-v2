@@ -2,7 +2,6 @@ package com.company.jobmonitor.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -92,7 +90,7 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token)
                     .getPayload();
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Invalid JWT token: {}", e.getMessage());
+            System.err.println("Invalid JWT token: " + e.getMessage());
             throw e;
         }
     }
@@ -102,9 +100,17 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    public Long getUserIdFromToken(String token) {
+    public Integer getUserIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
-        return claims.get("userId", Long.class);
+        Object userIdObj = claims.get("userId");
+        if (userIdObj instanceof Integer) {
+            return (Integer) userIdObj;
+        } else if (userIdObj instanceof Long) {
+            return ((Long) userIdObj).intValue();
+        } else if (userIdObj instanceof Number) {
+            return ((Number) userIdObj).intValue();
+        }
+        throw new IllegalArgumentException("Invalid userId type in token");
     }
 
     public boolean validateToken(String token) {
@@ -112,7 +118,7 @@ public class JwtTokenProvider {
             Claims claims = getClaimsFromToken(token);
             return !claims.getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("JWT validation error: {}", e.getMessage());
+            System.err.println("JWT validation error: " + e.getMessage());
             return false;
         }
     }
@@ -144,7 +150,29 @@ public class JwtTokenProvider {
         return accessTokenValidityInMilliseconds;
     }
 
-    public long getRefreshTokenValidityInMilliseconds() {
-        return refreshTokenValidityInMilliseconds;
+    public String generateToken(org.springframework.security.core.userdetails.UserDetails userDetails) {
+        UserPrincipal userPrincipal = (UserPrincipal) userDetails;
+        
+        Instant now = Instant.now();
+        Instant validity = now.plus(accessTokenValidityInMilliseconds, ChronoUnit.MILLIS);
+
+        Set<String> authorities = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("sub", userPrincipal.getUsername());
+        claims.put("userId", userPrincipal.getId());
+        claims.put("email", userPrincipal.getEmail());
+        claims.put("authorities", authorities);
+        claims.put("tokenType", "ACCESS");
+
+        return Jwts.builder()
+                .claims(claims)
+                .subject(userPrincipal.getUsername())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(validity))
+                .signWith(key, Jwts.SIG.HS512)
+                .compact();
     }
 }

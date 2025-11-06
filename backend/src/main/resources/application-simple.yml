@@ -1,0 +1,27 @@
+# Simplified configuration for testing
+spring:
+  application:
+    name: job-monitoring-tool
+
+  # Disable database auto-configuration
+  autoconfigure:
+    exclude:
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+    - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+
+  # Disable security for now
+  security:
+    enabled: false
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Logging
+logging:
+  level:
+    com.company.jobmonitor: DEBUG
+    root: INFO
