@@ -2,7 +2,7 @@
 spring:
   profiles:
     active: prod
-    
+
   # Database Configuration für Production
   datasource:
     url: jdbc:sqlite:/opt/job-monitor/data/jobmonitor.db
@@ -10,25 +10,25 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 5
       connection-timeout: 30000
-      
+
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: validate  # Keine automatischen Schema-Änderungen in Prod
+      ddl-auto: validate # Keine automatischen Schema-Änderungen in Prod
     show-sql: false
-    
+
   # Security
   security:
     jwt:
       secret: ${JWT_SECRET:your-very-secure-production-secret-key-here-at-least-512-bits-long-for-hs512}
-      access-token-validity: 3600000  # 1 Stunde
-      refresh-token-validity: 86400000  # 24 Stunden
+      access-token-validity: 3600000 # 1 Stunde
+      refresh-token-validity: 86400000 # 24 Stunden
 
 # Server Configuration
 server:
   port: 8080
   shutdown: graceful
-  
+
 # Logging Configuration
 logging:
   level:
