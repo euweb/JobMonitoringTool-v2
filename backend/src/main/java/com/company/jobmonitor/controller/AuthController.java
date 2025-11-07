@@ -2,11 +2,12 @@ package com.company.jobmonitor.controller;
 
 import com.company.jobmonitor.dto.JwtAuthenticationResponse;
 import com.company.jobmonitor.dto.LoginRequest;
+import com.company.jobmonitor.dto.MessageResponse;
+import com.company.jobmonitor.dto.SignUpRequest;
 import com.company.jobmonitor.dto.UserDto;
 import com.company.jobmonitor.entity.User;
 import com.company.jobmonitor.repository.UserRepository;
 import com.company.jobmonitor.security.JwtTokenProvider;
-import com.company.jobmonitor.service.CustomUserDetailsService;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +33,16 @@ public class AuthController {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtTokenProvider tokenProvider;
-  private final CustomUserDetailsService userDetailsService;
 
   public AuthController(
       AuthenticationManager authenticationManager,
       UserRepository userRepository,
       PasswordEncoder passwordEncoder,
-      JwtTokenProvider tokenProvider,
-      CustomUserDetailsService userDetailsService) {
+      JwtTokenProvider tokenProvider) {
     this.authenticationManager = authenticationManager;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.tokenProvider = tokenProvider;
-    this.userDetailsService = userDetailsService;
   }
 
   @PostMapping("/login")
@@ -121,71 +119,5 @@ public class AuthController {
     UserDto userDto = UserDto.from(user);
 
     return ResponseEntity.ok(userDto);
-  }
-
-  // Helper classes for requests and responses
-  public static class SignUpRequest {
-    private String username;
-    private String email;
-    private String password;
-    private String firstName;
-    private String lastName;
-
-    // Getters and setters
-    public String getUsername() {
-      return username;
-    }
-
-    public void setUsername(String username) {
-      this.username = username;
-    }
-
-    public String getEmail() {
-      return email;
-    }
-
-    public void setEmail(String email) {
-      this.email = email;
-    }
-
-    public String getPassword() {
-      return password;
-    }
-
-    public void setPassword(String password) {
-      this.password = password;
-    }
-
-    public String getFirstName() {
-      return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-      this.firstName = firstName;
-    }
-
-    public String getLastName() {
-      return lastName;
-    }
-
-    public void setLastName(String lastName) {
-      this.lastName = lastName;
-    }
-  }
-
-  public static class MessageResponse {
-    private String message;
-
-    public MessageResponse(String message) {
-      this.message = message;
-    }
-
-    public String getMessage() {
-      return message;
-    }
-
-    public void setMessage(String message) {
-      this.message = message;
-    }
   }
 }

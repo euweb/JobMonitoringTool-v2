@@ -16,7 +16,7 @@ spring:
   jpa:
     database-platform: org.hibernate.community.dialect.SQLiteDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
@@ -33,12 +33,12 @@ spring:
     baseline-on-migrate: true
     validate-on-migrate: true
 
-  # Security
+  # Security JWT Configuration
   security:
     jwt:
-      secret: ${JWT_SECRET:mySecretKey12345678901234567890123456789012345678901234567890123456789012345678901234567890}
-      access-token-validity: 900000 # 15 minutes
-      refresh-token-validity: 604800000 # 7 days
+      secret: myVeryLongSecretKeyForJWTSigningThatIsAtLeast256BitsLong1234567890ABCDEFGHIJKLMNOP
+      access-token-validity: 900000 # 15 minutes in milliseconds
+      refresh-token-validity: 604800000 # 7 days in milliseconds
 
   # Web Configuration
   web:
