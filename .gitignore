@@ -35,4 +35,4 @@ backend/target/*
 backend/src/main/resources/static/*
 
 # Database Files
-backend/data/jobmonitor.db
+*/jobmonitor.db
