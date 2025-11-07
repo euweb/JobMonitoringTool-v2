@@ -46,7 +46,7 @@ class AdminControllerTest {
     testUserDto.setEmail("test@example.com");
     testUserDto.setFirstName("Test");
     testUserDto.setLastName("User");
-    testUserDto.setRole("USER");
+    testUserDto.setRole(User.Role.USER);
     testUserDto.setEnabled(true);
   }
 
@@ -118,7 +118,7 @@ class AdminControllerTest {
     updatedUser.setEmail("updated@example.com");
     updatedUser.setFirstName("Updated");
     updatedUser.setLastName("User");
-    updatedUser.setRole("ADMIN");
+    updatedUser.setRole(User.Role.ADMIN);
 
     when(userService.updateUser(
             eq(1), eq("updated@example.com"), eq("Updated"), eq("User"), eq(User.Role.ADMIN)))
@@ -134,7 +134,7 @@ class AdminControllerTest {
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.email").value("updated@example.com"))
         .andExpect(jsonPath("$.firstName").value("Updated"))
-        .andExpected(jsonPath("$.role").value("ADMIN"));
+        .andExpect(jsonPath("$.role").value("ADMIN"));
   }
 
   @Test

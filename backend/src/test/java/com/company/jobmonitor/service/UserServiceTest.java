@@ -55,7 +55,7 @@ class UserServiceTest {
     testUserDto.setEmail("test@example.com");
     testUserDto.setFirstName("Test");
     testUserDto.setLastName("User");
-    testUserDto.setRole("USER");
+    testUserDto.setRole(User.Role.USER);
     testUserDto.setEnabled(true);
   }
 
@@ -130,7 +130,7 @@ class UserServiceTest {
     assertEquals("new@example.com", result.getEmail());
     assertEquals("New", result.getFirstName());
     assertEquals("Name", result.getLastName());
-    assertEquals("ADMIN", result.getRole());
+    assertEquals(User.Role.ADMIN, result.getRole());
     verify(userRepository).findById(1);
     verify(userRepository).save(any(User.class));
   }
@@ -168,20 +168,20 @@ class UserServiceTest {
   @Test
   void deleteUser_WhenUserExists_ShouldDeleteUser() {
     // Given
-    when(userRepository.existsById(1)).thenReturn(true);
+    when(userRepository.findById(1)).thenReturn(Optional.of(testUser));
 
     // When
     userService.deleteUser(1);
 
     // Then
-    verify(userRepository).existsById(1);
-    verify(userRepository).deleteById(1);
+    verify(userRepository).findById(1);
+    verify(userRepository).delete(testUser);
   }
 
   @Test
   void deleteUser_WhenUserDoesNotExist_ShouldThrowException() {
     // Given
-    when(userRepository.existsById(1)).thenReturn(false);
+    when(userRepository.findById(1)).thenReturn(Optional.empty());
 
     // When & Then
     assertThrows(
@@ -189,7 +189,7 @@ class UserServiceTest {
         () -> {
           userService.deleteUser(1);
         });
-    verify(userRepository).existsById(1);
-    verify(userRepository, never()).deleteById(1);
+    verify(userRepository).findById(1);
+    verify(userRepository, never()).delete(any(User.class));
   }
 }

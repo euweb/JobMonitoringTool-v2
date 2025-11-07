@@ -61,30 +61,29 @@ public class AdminController {
   @Operation(
       summary = "Get all users",
       description = "Retrieves a list of all users in the system. Requires ADMIN role.")
-  @ApiResponses(
-      value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Successfully retrieved users list",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = UserDto.class))),
-        @ApiResponse(
-            responseCode = "401",
-            description = "Unauthorized - invalid or missing JWT token",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = MessageResponse.class))),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden - requires ADMIN role",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = MessageResponse.class)))
-      })
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Successfully retrieved users list",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserDto.class))),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Unauthorized - invalid or missing JWT token",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(
+        responseCode = "403",
+        description = "Forbidden - requires ADMIN role",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class)))
+  })
   @GetMapping("/users")
   public ResponseEntity<List<UserDto>> getAllUsers() {
     List<UserDto> users = userService.getAllUsers();
