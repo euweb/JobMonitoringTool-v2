@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Spring Boot",
+      "request": "launch",
+      "mainClass": "com.company.jobmonitor.JobMonitorApplication",
+      "projectName": "job-monitoring-backend",
+      "cwd": "${workspaceFolder}/backend",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "args": "",
+      "console": "internalConsole",
+      "stopOnEntry": false,
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "dev"
+      }
+    },
+    {
+      "type": "java",
+      "name": "Debug Spring Boot (Production)",
+      "request": "launch",
+      "mainClass": "com.company.jobmonitor.JobMonitorApplication",
+      "projectName": "job-monitoring-backend",
+      "cwd": "${workspaceFolder}/backend",
+      "vmArgs": "-Dspring.profiles.active=prod -Xmx2g",
+      "args": "",
+      "console": "internalConsole",
+      "stopOnEntry": false,
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "prod"
+      }
+    },
+    {
+      "type": "java",
+      "name": "Attach to Running Spring Boot",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "projectName": "job-monitoring-backend"
+    }
+  ]
+}

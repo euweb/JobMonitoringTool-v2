@@ -3,5 +3,25 @@
   "java.compile.nullAnalysis.mode": "automatic",
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "files.trimFinalNewlines": true
+  "files.trimFinalNewlines": true,
+
+  // Java Debug Settings
+  "java.debug.settings.enableRunDebugCodeLens": true,
+  "java.debug.settings.onBuildFailureProceed": true,
+  "java.debug.settings.showQualifiedNames": true,
+  "java.debug.settings.showLogicalStructure": true,
+  "java.debug.settings.enableHotCodeReplace": true,
+  "java.debug.logLevel": "warn",
+
+  // Spring Boot specific
+  "spring-boot.ls.java.boot-version": "3.2.1",
+  "spring-boot.ls.java.live-information.fetch-data.enabled": true,
+
+  // Auto save for debugging
+  "files.autoSave": "onFocusChange",
+
+  // File associations
+  "files.associations": {
+    "*.yml": "yaml"
+  }
 }
