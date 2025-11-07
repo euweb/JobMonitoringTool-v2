@@ -5,7 +5,7 @@ spring:
 
   # Database Configuration (SQLite)
   datasource:
-    url: jdbc:sqlite:./data/jobmonitor.db
+    url: jdbc:sqlite:./jobmonitor.db
     driver-class-name: org.sqlite.JDBC
     hikari:
       connection-test-query: SELECT 1
@@ -44,6 +44,12 @@ spring:
   web:
     resources:
       static-locations: classpath:/static/
+
+  # Error handling for SPA
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
 
   # Actuator
   management:
