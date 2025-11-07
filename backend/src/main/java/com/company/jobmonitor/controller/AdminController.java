@@ -37,7 +37,7 @@ public class AdminController {
   }
 
   @GetMapping("/users/{id}")
-  public ResponseEntity<UserDto> getUserById(@PathVariable Integer id) {
+  public ResponseEntity<UserDto> getUserById(@PathVariable("id") Integer id) {
     return userService
         .getUserById(id)
         .map(user -> ResponseEntity.ok(user))
@@ -81,7 +81,7 @@ public class AdminController {
 
   @PutMapping("/users/{id}")
   public ResponseEntity<?> updateUser(
-      @PathVariable Integer id, @RequestBody Map<String, Object> updates) {
+      @PathVariable("id") Integer id, @RequestBody Map<String, Object> updates) {
     try {
       String email = (String) updates.get("email");
       String firstName = (String) updates.get("firstName");
@@ -97,7 +97,7 @@ public class AdminController {
   }
 
   @PostMapping("/users/{id}/toggle-enabled")
-  public ResponseEntity<?> toggleUserEnabled(@PathVariable Integer id) {
+  public ResponseEntity<?> toggleUserEnabled(@PathVariable("id") Integer id) {
     try {
       userService.toggleUserEnabled(id);
       return ResponseEntity.ok(new MessageResponse("User status updated successfully"));
@@ -107,7 +107,7 @@ public class AdminController {
   }
 
   @DeleteMapping("/users/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
+  public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
     try {
       userService.deleteUser(id);
       return ResponseEntity.ok(new MessageResponse("User deleted successfully"));
