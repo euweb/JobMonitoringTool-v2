@@ -19,6 +19,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST Controller for administrative user management operations.
+ *
+ * <p>This controller provides endpoints for admin users to manage other users in the system. All
+ * endpoints require ADMIN role authorization and provide full CRUD operations for user management.
+ *
+ * <p>Base URL: {@code /api/admin}
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -30,12 +42,25 @@ public class AdminController {
     this.userService = userService;
   }
 
+  /**
+   * Retrieves all users in the system.
+   *
+   * @return ResponseEntity containing a list of all UserDto objects
+   * @apiNote GET /api/admin/users
+   */
   @GetMapping("/users")
   public ResponseEntity<List<UserDto>> getAllUsers() {
     List<UserDto> users = userService.getAllUsers();
     return ResponseEntity.ok(users);
   }
 
+  /**
+   * Retrieves a specific user by their ID.
+   *
+   * @param id the unique identifier of the user
+   * @return ResponseEntity containing the UserDto if found, 404 Not Found otherwise
+   * @apiNote GET /api/admin/users/{id}
+   */
   @GetMapping("/users/{id}")
   public ResponseEntity<UserDto> getUserById(@PathVariable("id") Integer id) {
     return userService
@@ -44,6 +69,16 @@ public class AdminController {
         .orElse(ResponseEntity.notFound().build());
   }
 
+  /**
+   * Creates a new regular user account.
+   *
+   * <p>Creates a new user with USER role. For creating admin accounts, use the {@link
+   * #createAdminUser(SignUpRequest)} endpoint instead.
+   *
+   * @param signUpRequest the user registration data
+   * @return ResponseEntity containing the created UserDto or error message
+   * @apiNote POST /api/admin/users
+   */
   @PostMapping("/users")
   public ResponseEntity<?> createUser(@Valid @RequestBody SignUpRequest signUpRequest) {
     try {
@@ -62,6 +97,16 @@ public class AdminController {
     }
   }
 
+  /**
+   * Creates a new admin user account.
+   *
+   * <p>Creates a new user with ADMIN role, granting full system access. Use this endpoint carefully
+   * as it creates privileged accounts.
+   *
+   * @param signUpRequest the admin user registration data
+   * @return ResponseEntity containing the created UserDto or error message
+   * @apiNote POST /api/admin/users/admin
+   */
   @PostMapping("/users/admin")
   public ResponseEntity<?> createAdminUser(@Valid @RequestBody SignUpRequest signUpRequest) {
     try {
@@ -79,6 +124,17 @@ public class AdminController {
     }
   }
 
+  /**
+   * Updates an existing user's information.
+   *
+   * <p>Allows updating email, first name, last name, and role of an existing user. All fields are
+   * optional in the request body.
+   *
+   * @param id the unique identifier of the user to update
+   * @param updates a map containing the fields to update
+   * @return ResponseEntity containing the updated UserDto or error message
+   * @apiNote PUT /api/admin/users/{id}
+   */
   @PutMapping("/users/{id}")
   public ResponseEntity<?> updateUser(
       @PathVariable("id") Integer id, @RequestBody Map<String, Object> updates) {
@@ -96,6 +152,16 @@ public class AdminController {
     }
   }
 
+  /**
+   * Toggles a user's enabled/disabled status.
+   *
+   * <p>This endpoint provides a safe way to activate or deactivate user accounts without permanent
+   * deletion. Disabled users cannot log in but retain their data.
+   *
+   * @param id the unique identifier of the user to toggle
+   * @return ResponseEntity containing success message or error message
+   * @apiNote POST /api/admin/users/{id}/toggle-enabled
+   */
   @PostMapping("/users/{id}/toggle-enabled")
   public ResponseEntity<?> toggleUserEnabled(@PathVariable("id") Integer id) {
     try {
@@ -106,6 +172,17 @@ public class AdminController {
     }
   }
 
+  /**
+   * Permanently deletes a user from the system.
+   *
+   * <p><strong>Warning:</strong> This operation permanently removes the user and cannot be undone.
+   * Consider using {@link #toggleUserEnabled(Integer)} instead to preserve audit trails while
+   * disabling access.
+   *
+   * @param id the unique identifier of the user to delete
+   * @return ResponseEntity containing success message or error message
+   * @apiNote DELETE /api/admin/users/{id}
+   */
   @DeleteMapping("/users/{id}")
   public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
     try {
@@ -116,6 +193,15 @@ public class AdminController {
     }
   }
 
+  /**
+   * Retrieves system statistics for administrative dashboard.
+   *
+   * <p>Provides key metrics including total user count and overall system status for monitoring and
+   * administrative purposes.
+   *
+   * @return ResponseEntity containing a map of system statistics
+   * @apiNote GET /api/admin/stats
+   */
   @GetMapping("/stats")
   public ResponseEntity<Map<String, Object>> getAdminStats() {
     Map<String, Object> stats =

@@ -11,6 +11,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST Controller for system setup and testing operations.
+ *
+ * <p>This controller provides endpoints for initializing the system with test users, password hash
+ * generation, and password verification utilities. These endpoints are primarily intended for
+ * development and testing purposes.
+ *
+ * <p><strong>Security Note:</strong> These endpoints should be disabled or secured in production
+ * environments as they provide administrative access without authentication.
+ *
+ * <p>Base URL: {@code /api/setup}
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
 @RestController
 @RequestMapping("/api/setup")
 public class SetupController {
@@ -23,6 +39,24 @@ public class SetupController {
     this.passwordEncoder = passwordEncoder;
   }
 
+  /**
+   * Initializes the system with predefined test users.
+   *
+   * <p>This endpoint clears all existing users and creates a fresh set of test users for
+   * development and testing purposes. Creates:
+   *
+   * <ul>
+   *   <li>admin / admin123 (ADMIN role)
+   *   <li>user / user123 (USER role)
+   *   <li>testuser / testpassword (USER role)
+   * </ul>
+   *
+   * <p><strong>WARNING:</strong> This operation permanently deletes all existing users. Should only
+   * be used in development environments.
+   *
+   * @return ResponseEntity containing creation status for each user
+   * @apiNote POST /api/setup/init-users
+   */
   @PostMapping("/init-users")
   public ResponseEntity<Map<String, String>> initUsers() {
     Map<String, String> response = new HashMap<>();
@@ -107,6 +141,16 @@ public class SetupController {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Generates a password hash for testing purposes.
+   *
+   * <p>Utility endpoint that encodes a plain text password using the configured password encoder.
+   * Useful for generating test data and verifying hash generation.
+   *
+   * @param password the plain text password to encode
+   * @return ResponseEntity containing the original password and generated hash
+   * @apiNote POST /api/setup/generate-hash?password=yourpassword
+   */
   @PostMapping("/generate-hash")
   public ResponseEntity<String> generateHash(
       @org.springframework.web.bind.annotation.RequestParam String password) {
@@ -115,6 +159,17 @@ public class SetupController {
     return ResponseEntity.ok("Password: " + password + "\nHash: " + hash);
   }
 
+  /**
+   * Tests password verification against a hash.
+   *
+   * <p>Utility endpoint that verifies if a plain text password matches a given hash. Useful for
+   * debugging authentication issues and validating password encoding/verification logic.
+   *
+   * @param password the plain text password to verify
+   * @param hash the encoded hash to verify against
+   * @return ResponseEntity indicating whether the password matches the hash
+   * @apiNote POST /api/setup/test-password?password=yourpassword&hash=yourhash
+   */
   @PostMapping("/test-password")
   public ResponseEntity<String> testPassword(
       @org.springframework.web.bind.annotation.RequestParam String password,

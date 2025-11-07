@@ -3,6 +3,20 @@ package com.company.jobmonitor.dto;
 import com.company.jobmonitor.entity.User;
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object for User entity.
+ *
+ * <p>This DTO provides a secure representation of user data for API responses, excluding sensitive
+ * information such as password hashes. It includes all necessary user profile information and
+ * account status details.
+ *
+ * <p>The DTO automatically computes derived fields like {@code fullName} and provides factory
+ * methods for easy conversion from User entities.
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
 public class UserDto {
 
   private Integer id;

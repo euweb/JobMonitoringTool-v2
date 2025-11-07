@@ -24,6 +24,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST Controller for authentication and user registration operations.
+ *
+ * <p>This controller handles user authentication, registration, and current user information
+ * retrieval. It provides JWT-based authentication endpoints and supports CORS for cross-origin
+ * requests.
+ *
+ * <p>Base URL: {@code /api/auth}
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -45,6 +58,16 @@ public class AuthController {
     this.tokenProvider = tokenProvider;
   }
 
+  /**
+   * Authenticates a user and provides JWT token.
+   *
+   * <p>Validates user credentials and returns a JWT token for subsequent authenticated requests.
+   * The token includes user information and expires based on configured timeout settings.
+   *
+   * @param loginRequest containing username and password
+   * @return ResponseEntity with JWT token and user info or error message
+   * @apiNote POST /api/auth/login
+   */
   @PostMapping("/login")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
     try {
@@ -72,6 +95,16 @@ public class AuthController {
     }
   }
 
+  /**
+   * Registers a new user account.
+   *
+   * <p>Creates a new user account with USER role. Validates that username and email are unique in
+   * the system. Passwords are automatically encoded before storage.
+   *
+   * @param signUpRequest containing user registration information
+   * @return ResponseEntity with success message or error details
+   * @apiNote POST /api/auth/register
+   */
   @PostMapping("/register")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
@@ -102,6 +135,16 @@ public class AuthController {
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
   }
 
+  /**
+   * Retrieves information about the currently authenticated user.
+   *
+   * <p>Returns user profile information for the currently authenticated user based on the JWT
+   * token. Useful for client-side user context and profile display.
+   *
+   * @param authentication the current authentication context
+   * @return ResponseEntity containing current user's UserDto or error message
+   * @apiNote GET /api/auth/me
+   */
   @GetMapping("/me")
   public ResponseEntity<?> getCurrentUser(Authentication authentication) {
     if (authentication == null) {

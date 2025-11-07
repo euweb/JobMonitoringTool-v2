@@ -7,6 +7,27 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a user in the Job Monitoring System.
+ *
+ * <p>This entity stores user account information including authentication details, profile
+ * information, role-based permissions, and account status. The entity implements Spring Security's
+ * UserDetails contract through custom UserDetails implementation.
+ *
+ * <p>Key features:
+ *
+ * <ul>
+ *   <li>Unique username and email constraints
+ *   <li>Role-based access control (ADMIN, USER)
+ *   <li>Account status management (enabled, locked, expired)
+ *   <li>Audit fields for creation and modification tracking
+ *   <li>Version-based optimistic locking
+ * </ul>
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
 @Entity
 @Table(name = "users")
 public class User {
@@ -262,8 +283,18 @@ public class User {
     }
   }
 
+  /**
+   * User role enumeration defining access levels in the system.
+   *
+   * <ul>
+   *   <li>{@link #ADMIN} - Full administrative access to all system functions
+   *   <li>{@link #USER} - Standard user access to personal profile and features
+   * </ul>
+   */
   public enum Role {
+    /** Administrative role with full system access */
     ADMIN,
+    /** Standard user role with limited access */
     USER
   }
 }
