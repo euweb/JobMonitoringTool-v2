@@ -5,6 +5,14 @@ import com.company.jobmonitor.dto.SignUpRequest;
 import com.company.jobmonitor.dto.UserDto;
 import com.company.jobmonitor.entity.User;
 import com.company.jobmonitor.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +39,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0
  * @since 1.0
  */
+@Tag(name = "Admin Management", description = "Administrative operations for user management")
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminController {
 
   private final UserService userService;
@@ -48,6 +58,33 @@ public class AdminController {
    * @return ResponseEntity containing a list of all UserDto objects
    * @apiNote GET /api/admin/users
    */
+  @Operation(
+      summary = "Get all users",
+      description = "Retrieves a list of all users in the system. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved users list",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden - requires ADMIN role",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class)))
+      })
   @GetMapping("/users")
   public ResponseEntity<List<UserDto>> getAllUsers() {
     List<UserDto> users = userService.getAllUsers();
@@ -61,8 +98,34 @@ public class AdminController {
    * @return ResponseEntity containing the UserDto if found, 404 Not Found otherwise
    * @apiNote GET /api/admin/users/{id}
    */
+  @Operation(
+      summary = "Get user by ID",
+      description = "Retrieves a specific user by their unique identifier. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved user",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User not found",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role")
+      })
   @GetMapping("/users/{id}")
-  public ResponseEntity<UserDto> getUserById(@PathVariable("id") Integer id) {
+  public ResponseEntity<UserDto> getUserById(
+      @Parameter(description = "User ID", required = true, example = "1") @PathVariable("id")
+          Integer id) {
     return userService
         .getUserById(id)
         .map(user -> ResponseEntity.ok(user))
@@ -79,8 +142,39 @@ public class AdminController {
    * @return ResponseEntity containing the created UserDto or error message
    * @apiNote POST /api/admin/users
    */
+  @Operation(
+      summary = "Create new user",
+      description = "Creates a new user account with USER role. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User created successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid input or user already exists",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role")
+      })
   @PostMapping("/users")
-  public ResponseEntity<?> createUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+  public ResponseEntity<?> createUser(
+      @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              description = "User registration data",
+              required = true,
+              content = @Content(schema = @Schema(implementation = SignUpRequest.class)))
+          @Valid
+          @RequestBody
+          SignUpRequest signUpRequest) {
     try {
       UserDto userDto =
           userService.createUser(
@@ -107,8 +201,41 @@ public class AdminController {
    * @return ResponseEntity containing the created UserDto or error message
    * @apiNote POST /api/admin/users/admin
    */
+  @Operation(
+      summary = "Create new admin user",
+      description =
+          "Creates a new user account with ADMIN role. Use with caution as this grants full system"
+              + " access. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Admin user created successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid input or user already exists",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role")
+      })
   @PostMapping("/users/admin")
-  public ResponseEntity<?> createAdminUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+  public ResponseEntity<?> createAdminUser(
+      @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              description = "Admin user registration data",
+              required = true,
+              content = @Content(schema = @Schema(implementation = SignUpRequest.class)))
+          @Valid
+          @RequestBody
+          SignUpRequest signUpRequest) {
     try {
       UserDto userDto =
           userService.createUser(
@@ -135,9 +262,42 @@ public class AdminController {
    * @return ResponseEntity containing the updated UserDto or error message
    * @apiNote PUT /api/admin/users/{id}
    */
+  @Operation(
+      summary = "Update user information",
+      description =
+          "Updates an existing user's profile information. All fields in the request body are"
+              + " optional. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User updated successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid input data",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+      })
   @PutMapping("/users/{id}")
   public ResponseEntity<?> updateUser(
-      @PathVariable("id") Integer id, @RequestBody Map<String, Object> updates) {
+      @Parameter(description = "User ID", required = true, example = "1") @PathVariable("id")
+          Integer id,
+      @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              description = "Map containing fields to update (email, firstName, lastName, role)",
+              required = true)
+          @RequestBody
+          Map<String, Object> updates) {
     try {
       String email = (String) updates.get("email");
       String firstName = (String) updates.get("firstName");
@@ -162,8 +322,37 @@ public class AdminController {
    * @return ResponseEntity containing success message or error message
    * @apiNote POST /api/admin/users/{id}/toggle-enabled
    */
+  @Operation(
+      summary = "Toggle user enabled status",
+      description =
+          "Enables or disables a user account. Disabled users cannot log in but retain their data."
+              + " Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User status updated successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Error updating user status",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+      })
   @PostMapping("/users/{id}/toggle-enabled")
-  public ResponseEntity<?> toggleUserEnabled(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> toggleUserEnabled(
+      @Parameter(description = "User ID", required = true, example = "1") @PathVariable("id")
+          Integer id) {
     try {
       userService.toggleUserEnabled(id);
       return ResponseEntity.ok(new MessageResponse("User status updated successfully"));
@@ -183,8 +372,37 @@ public class AdminController {
    * @return ResponseEntity containing success message or error message
    * @apiNote DELETE /api/admin/users/{id}
    */
+  @Operation(
+      summary = "Delete user permanently",
+      description =
+          "WARNING: Permanently deletes a user from the system. This action cannot be undone."
+              + " Consider disabling the user instead. Requires ADMIN role.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "User deleted successfully",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Error deleting user",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Unauthorized - invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+      })
   @DeleteMapping("/users/{id}")
-  public ResponseEntity<?> deleteUser(@PathVariable("id") Integer id) {
+  public ResponseEntity<?> deleteUser(
+      @Parameter(description = "User ID", required = true, example = "1") @PathVariable("id")
+          Integer id) {
     try {
       userService.deleteUser(id);
       return ResponseEntity.ok(new MessageResponse("User deleted successfully"));
@@ -202,6 +420,16 @@ public class AdminController {
    * @return ResponseEntity containing a map of system statistics
    * @apiNote GET /api/admin/stats
    */
+  @Operation(
+      summary = "Get admin statistics",
+      description =
+          "Retrieves system statistics including user counts and system status. Requires ADMIN"
+              + " role.")
+  @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT token"),
+    @ApiResponse(responseCode = "403", description = "Forbidden - requires ADMIN role")
+  })
   @GetMapping("/stats")
   public ResponseEntity<Map<String, Object>> getAdminStats() {
     Map<String, Object> stats =

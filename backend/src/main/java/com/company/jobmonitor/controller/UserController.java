@@ -3,6 +3,13 @@ package com.company.jobmonitor.controller;
 import com.company.jobmonitor.dto.MessageResponse;
 import com.company.jobmonitor.dto.UserDto;
 import com.company.jobmonitor.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +29,13 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 1.0
  */
+@Tag(
+    name = "User Self-Service",
+    description = "Endpoints for authenticated users to manage their own profiles")
 @RestController
 @RequestMapping("/api/user")
 @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
   private final UserService userService;
@@ -43,6 +54,20 @@ public class UserController {
    * @return ResponseEntity containing the user's profile or 404 if not found
    * @apiNote GET /api/user/profile
    */
+  @Operation(
+      summary = "Get current user profile",
+      description = "Retrieves the profile information of the currently authenticated user.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Profile retrieved successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserDto.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT token"),
+    @ApiResponse(responseCode = "404", description = "User profile not found")
+  })
   @GetMapping("/profile")
   public ResponseEntity<UserDto> getUserProfile(Principal principal) {
     return userService
@@ -62,6 +87,29 @@ public class UserController {
    * @return ResponseEntity containing the updated profile or error message
    * @apiNote PUT /api/user/profile
    */
+  @Operation(
+      summary = "Update current user profile",
+      description =
+          "Updates the current user's profile information. Users can modify email, first name, and"
+              + " last name. Role changes require ADMIN privileges.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Profile updated successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UserDto.class))),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid input data",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT token"),
+    @ApiResponse(responseCode = "404", description = "User not found")
+  })
   @PutMapping("/profile")
   public ResponseEntity<?> updateUserProfile(
       Principal principal, @RequestBody Map<String, Object> updates) {
@@ -89,6 +137,28 @@ public class UserController {
    * @return ResponseEntity with success message or error details
    * @apiNote POST /api/user/change-password
    */
+  @Operation(
+      summary = "Change current user password",
+      description =
+          "Changes the current user's password. Requires current password for verification. New"
+              + " password must be at least 6 characters long.")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Password changed successfully",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(
+        responseCode = "400",
+        description = "Invalid password data or current password incorrect",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = MessageResponse.class))),
+    @ApiResponse(responseCode = "401", description = "Unauthorized - invalid or missing JWT token")
+  })
   @PostMapping("/change-password")
   public ResponseEntity<?> changePassword(
       Principal principal, @RequestBody Map<String, String> passwordData) {

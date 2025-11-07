@@ -2,6 +2,11 @@ package com.company.jobmonitor.controller;
 
 import com.company.jobmonitor.entity.User;
 import com.company.jobmonitor.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +32,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0
  * @since 1.0
  */
+@Tag(
+    name = "System Setup",
+    description = "Development and testing endpoints for system initialization")
 @RestController
 @RequestMapping("/api/setup")
 public class SetupController {
@@ -57,6 +65,18 @@ public class SetupController {
    * @return ResponseEntity containing creation status for each user
    * @apiNote POST /api/setup/init-users
    */
+  @Operation(
+      summary = "Initialize test users",
+      description =
+          "WARNING: Clears all existing users and creates fresh test users for development. Only"
+              + " use in development environments!")
+  @ApiResponses({
+    @ApiResponse(
+        responseCode = "200",
+        description = "Test users created successfully",
+        content = @Content(mediaType = "application/json")),
+    @ApiResponse(responseCode = "500", description = "Error during user initialization")
+  })
   @PostMapping("/init-users")
   public ResponseEntity<Map<String, String>> initUsers() {
     Map<String, String> response = new HashMap<>();

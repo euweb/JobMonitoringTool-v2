@@ -8,6 +8,13 @@ import com.company.jobmonitor.dto.UserDto;
 import com.company.jobmonitor.entity.User;
 import com.company.jobmonitor.repository.UserRepository;
 import com.company.jobmonitor.security.JwtTokenProvider;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0
  * @since 1.0
  */
+@Tag(name = "Authentication", description = "Authentication and user registration endpoints")
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -68,8 +76,45 @@ public class AuthController {
    * @return ResponseEntity with JWT token and user info or error message
    * @apiNote POST /api/auth/login
    */
+  @Operation(
+      summary = "User authentication",
+      description =
+          """
+          Authenticates a user with username and password credentials.
+
+          Returns a JWT token that must be included in subsequent requests.
+          Token format: Authorization: Bearer <token>
+
+          Default users for testing:
+          - admin / admin123 (ADMIN role)
+          - user / user123 (USER role)
+          """)
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Authentication successful",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = JwtAuthenticationResponse.class))),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid credentials",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class)))
+      })
   @PostMapping("/login")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<?> authenticateUser(
+      @io.swagger.v3.oas.annotations.parameters.RequestBody(
+              description = "User login credentials",
+              required = true,
+              content = @Content(schema = @Schema(implementation = LoginRequest.class)))
+          @Valid
+          @RequestBody
+          LoginRequest loginRequest) {
     try {
       Authentication authentication =
           authenticationManager.authenticate(
@@ -145,6 +190,28 @@ public class AuthController {
    * @return ResponseEntity containing current user's UserDto or error message
    * @apiNote GET /api/auth/me
    */
+  @Operation(
+      summary = "Get current user information",
+      description =
+          "Retrieves profile information for the currently authenticated user based on JWT token.")
+  @ApiResponses(
+      value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved user information",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = UserDto.class))),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Not authenticated - missing or invalid JWT token",
+            content =
+                @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = MessageResponse.class)))
+      })
+  @SecurityRequirement(name = "bearerAuth")
   @GetMapping("/me")
   public ResponseEntity<?> getCurrentUser(Authentication authentication) {
     if (authentication == null) {

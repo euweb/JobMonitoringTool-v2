@@ -1,6 +1,7 @@
 package com.company.jobmonitor.dto;
 
 import com.company.jobmonitor.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 
 /**
@@ -17,20 +18,46 @@ import java.time.LocalDateTime;
  * @version 1.0
  * @since 1.0
  */
+@Schema(description = "User data transfer object for secure API responses")
 public class UserDto {
 
+  @Schema(description = "Unique user identifier", example = "1")
   private Integer id;
+
+  @Schema(description = "Unique username for login", example = "john_doe")
   private String username;
+
+  @Schema(description = "User's email address", example = "john.doe@example.com")
   private String email;
+
+  @Schema(description = "User's first name", example = "John")
   private String firstName;
+
+  @Schema(description = "User's last name", example = "Doe")
   private String lastName;
+
+  @Schema(description = "Computed full name (first + last)", example = "John Doe")
   private String fullName;
+
+  @Schema(description = "User's system role", example = "USER")
   private User.Role role;
+
+  @Schema(description = "Whether the user account is enabled", example = "true")
   private boolean enabled;
+
+  @Schema(description = "Whether the user account is not expired", example = "true")
   private boolean accountNonExpired;
+
+  @Schema(description = "Whether the user account is not locked", example = "true")
   private boolean accountNonLocked;
+
+  @Schema(description = "Whether the user credentials are not expired", example = "true")
   private boolean credentialsNonExpired;
+
+  @Schema(description = "User account creation timestamp", example = "2024-01-15T10:30:00")
   private LocalDateTime createdAt;
+
+  @Schema(description = "User account last update timestamp", example = "2024-01-20T14:45:00")
   private LocalDateTime updatedAt;
 
   // Constructors

@@ -1,11 +1,37 @@
 package com.company.jobmonitor.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+/**
+ * Data Transfer Object for JWT authentication responses.
+ *
+ * <p>Contains the JWT tokens and user information returned after successful authentication. Used as
+ * the response for POST /api/auth/login endpoint.
+ *
+ * @author JobMonitor Team
+ * @version 1.0
+ * @since 1.0
+ */
+@Schema(description = "JWT authentication response containing tokens and user information")
 public class JwtAuthenticationResponse {
 
+  @Schema(
+      description = "JWT access token for API authentication",
+      example = "eyJhbGciOiJIUzUxMiJ9...")
   private String accessToken;
+
+  @Schema(
+      description = "JWT refresh token for obtaining new access tokens",
+      example = "eyJhbGciOiJIUzUxMiJ9...")
   private String refreshToken;
+
+  @Schema(description = "Token type identifier", example = "Bearer")
   private String tokenType = "Bearer";
+
+  @Schema(description = "Token expiration time in milliseconds", example = "3600000")
   private long expiresIn;
+
+  @Schema(description = "Authenticated user information")
   private UserDto user;
 
   // Constructors
