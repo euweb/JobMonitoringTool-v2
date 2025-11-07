@@ -20,11 +20,36 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/authStore";
 import { adminService } from "@/services/adminService";
 
+/**
+ * Main dashboard component providing an overview of system status and user information.
+ *
+ * This component renders different content based on user role:
+ * - **Admin users**: See system statistics, user counts, and recent users list
+ * - **Regular users**: See personalized welcome message and basic system info
+ *
+ * Features:
+ * - Real-time data updates with automatic refresh intervals
+ * - Role-based content filtering
+ * - Loading states and error handling
+ * - Responsive grid layout
+ * - Material-UI components for consistent styling
+ *
+ * @returns JSX element representing the dashboard page
+ *
+ * @example
+ * ```tsx
+ * // Used in router configuration
+ * <Route path="/dashboard" element={<Dashboard />} />
+ * ```
+ */
 const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === "ADMIN";
 
-  // Fetch admin stats if user is admin
+  /**
+   * Fetches admin statistics if user has admin privileges.
+   * Data refreshes automatically every 30 seconds to provide real-time updates.
+   */
   const {
     data: adminStats,
     isLoading: statsLoading,
@@ -36,7 +61,10 @@ const Dashboard: React.FC = () => {
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
-  // Fetch user list if admin
+  /**
+   * Fetches user list for admin dashboard.
+   * Updates every minute to show current user activity status.
+   */
   const {
     data: users,
     isLoading: usersLoading,
