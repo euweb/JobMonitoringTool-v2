@@ -14,7 +14,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@hookform/resolvers": "^3.3.2",
+    "@hookform/resolvers": "^3.10.0",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@mui/styled-engine": "^7.3.5",
@@ -24,10 +24,10 @@
     "axios": "^1.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.48.2",
+    "react-hook-form": "^7.66.0",
     "react-router-dom": "^6.20.1",
     "recharts": "^2.8.0",
-    "zod": "^3.22.4",
+    "zod": "^3.25.76",
     "zustand": "^4.4.7"
   },
   "devDependencies": {

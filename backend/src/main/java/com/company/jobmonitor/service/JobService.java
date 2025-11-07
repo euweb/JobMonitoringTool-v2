@@ -333,10 +333,18 @@ public class JobService {
     // Get execution statistics
     Object[] stats = jobExecutionRepository.getExecutionStatistics(job.getId());
 
-    Long totalExecutions = stats[0] != null ? ((Number) stats[0]).longValue() : 0L;
-    Long successfulExecutions = stats[1] != null ? ((Number) stats[1]).longValue() : 0L;
-    Long failedExecutions = stats[2] != null ? ((Number) stats[2]).longValue() : 0L;
-    Double averageDuration = stats[3] != null ? ((Number) stats[3]).doubleValue() : null;
+    // Handle the case when stats array might be null or empty
+    Long totalExecutions = 0L;
+    Long successfulExecutions = 0L;
+    Long failedExecutions = 0L;
+    Double averageDuration = null;
+
+    if (stats != null && stats.length >= 4) {
+      totalExecutions = stats[0] != null ? ((Number) stats[0]).longValue() : 0L;
+      successfulExecutions = stats[1] != null ? ((Number) stats[1]).longValue() : 0L;
+      failedExecutions = stats[2] != null ? ((Number) stats[2]).longValue() : 0L;
+      averageDuration = stats[3] != null ? ((Number) stats[3]).doubleValue() : null;
+    }
 
     return JobDto.fromWithStats(
         job, totalExecutions, successfulExecutions, failedExecutions, averageDuration);
