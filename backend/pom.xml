@@ -3,19 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>com.company</groupId>
         <artifactId>job-monitoring-tool</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>job-monitoring-backend</artifactId>
     <packaging>jar</packaging>
-    
+
     <name>Job Monitoring Backend</name>
     <description>Spring Boot backend for Job Monitoring Tool</description>
-    
+
     <dependencies>
         <!-- Spring Boot Starters -->
         <dependency>
@@ -42,7 +42,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <!-- Database -->
         <dependency>
             <groupId>org.xerial</groupId>
@@ -53,7 +61,7 @@
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-community-dialects</artifactId>
         </dependency>
-        
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -72,27 +80,27 @@
             <version>0.12.3</version>
             <scope>runtime</scope>
         </dependency>
-        
+
         <!-- Utilities -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.9</version>
         </dependency>
-        
+
         <!-- Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.2.0</version>
         </dependency>
-        
+
         <!-- Database Migration -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
         </dependency>
-        
+
         <!-- Development Tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -100,7 +108,7 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -113,7 +121,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -130,7 +138,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Frontend Maven Plugin for Node.js/npm integration -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
@@ -152,7 +160,7 @@
                             <npmVersion>10.2.3</npmVersion>
                         </configuration>
                     </execution>
-                    
+
                     <!-- Install npm dependencies -->
                     <execution>
                         <id>npm install</id>
@@ -163,7 +171,7 @@
                             <arguments>ci</arguments>
                         </configuration>
                     </execution>
-                    
+
                     <!-- Build frontend -->
                     <execution>
                         <id>npm run build</id>
@@ -176,7 +184,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <!-- Copy frontend build to static resources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

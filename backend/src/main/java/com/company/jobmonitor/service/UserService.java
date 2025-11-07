@@ -6,6 +6,8 @@ import com.company.jobmonitor.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,7 @@ public class UserService {
   }
 
   /**
-   * Retrieves all users from the system.
+   * Retrieves all users from the system with caching enabled.
    *
    * <p>This method returns all registered users as DTOs, suitable for display in administrative
    * interfaces. Sensitive information like password hashes are excluded from the returned data.
@@ -58,23 +60,25 @@ public class UserService {
    * @return a list of all users as UserDto objects
    * @see UserDto
    */
+  @Cacheable("users")
   public List<UserDto> getAllUsers() {
     return userRepository.findAll().stream().map(UserDto::from).collect(Collectors.toList());
   }
 
   /**
-   * Retrieves a user by their unique identifier.
+   * Retrieves a user by their unique identifier with caching.
    *
    * @param id the unique identifier of the user to retrieve
    * @return an Optional containing the UserDto if found, empty otherwise
    * @throws IllegalArgumentException if the id is null
    */
+  @Cacheable(value = "users", key = "#id")
   public Optional<UserDto> getUserById(Integer id) {
     return userRepository.findById(id).map(UserDto::from);
   }
 
   /**
-   * Retrieves a user by their username.
+   * Retrieves a user by their username with caching.
    *
    * <p>Username lookup is case-sensitive and must match exactly.
    *
@@ -82,6 +86,7 @@ public class UserService {
    * @return an Optional containing the UserDto if found, empty otherwise
    * @throws IllegalArgumentException if the username is null or empty
    */
+  @Cacheable(value = "users", key = "#username")
   public Optional<UserDto> getUserByUsername(String username) {
     return userRepository.findByUsername(username).map(UserDto::from);
   }
@@ -158,6 +163,7 @@ public class UserService {
    * @return the updated user as a UserDto
    * @throws RuntimeException if the user is not found or email already exists
    */
+  @CacheEvict(value = "users", allEntries = true)
   public UserDto updateUser(
       Integer id, String email, String firstName, String lastName, User.Role role) {
     User user =
