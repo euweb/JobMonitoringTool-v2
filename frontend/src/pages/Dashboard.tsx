@@ -1,12 +1,5 @@
-import React from 'react'
-import {
-  Box,
-  Typography,
-  Grid,
-  Card,
-  CardContent,
-  Chip,
-} from '@mui/material'
+import React from "react";
+import { Box, Typography, Grid, Card, CardContent, Chip } from "@mui/material";
 
 const Dashboard: React.FC = () => {
   return (
@@ -14,7 +7,7 @@ const Dashboard: React.FC = () => {
       <Typography variant="h4" gutterBottom>
         Job Monitoring Dashboard
       </Typography>
-      
+
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
           <Card>
@@ -28,7 +21,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -41,7 +34,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -54,7 +47,7 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
@@ -67,26 +60,55 @@ const Dashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        
+
         <Grid item xs={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Recent Job Executions
               </Typography>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 {[
-                  { name: 'ETL Daily Sales', status: 'SUCCESS', time: '2 minutes ago' },
-                  { name: 'Data Validation', status: 'SUCCESS', time: '5 minutes ago' },
-                  { name: 'Report Generator', status: 'RUNNING', time: '10 minutes ago' },
-                  { name: 'Archive Cleanup', status: 'FAILED', time: '1 hour ago' },
+                  {
+                    name: "ETL Daily Sales",
+                    status: "SUCCESS",
+                    time: "2 minutes ago",
+                  },
+                  {
+                    name: "Data Validation",
+                    status: "SUCCESS",
+                    time: "5 minutes ago",
+                  },
+                  {
+                    name: "Report Generator",
+                    status: "RUNNING",
+                    time: "10 minutes ago",
+                  },
+                  {
+                    name: "Archive Cleanup",
+                    status: "FAILED",
+                    time: "1 hour ago",
+                  },
                 ].map((job, index) => (
-                  <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <Typography>{job.name}</Typography>
-                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                      <Chip 
-                        label={job.status} 
-                        color={job.status === 'SUCCESS' ? 'success' : job.status === 'RUNNING' ? 'info' : 'error'}
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Chip
+                        label={job.status}
+                        color={
+                          job.status === "SUCCESS"
+                            ? "success"
+                            : job.status === "RUNNING"
+                              ? "info"
+                              : "error"
+                        }
                         size="small"
                       />
                       <Typography variant="body2" color="textSecondary">
@@ -101,7 +123,7 @@ const Dashboard: React.FC = () => {
         </Grid>
       </Grid>
     </Box>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
