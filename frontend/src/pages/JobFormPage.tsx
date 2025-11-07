@@ -28,6 +28,7 @@ import {
   IconButton,
   Tooltip,
   Chip,
+  MenuItem,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -62,7 +63,7 @@ const jobFormSchema = z.object({
   workingDirectory: z.string().optional(),
   environmentVariables: z.string().optional(),
   isEnabled: z.boolean(),
-  priority: z.number().min(1).max(10),
+  priority: z.enum(["LOW", "NORMAL", "HIGH", "CRITICAL"]),
   maxRetries: z.number().min(0).max(10),
   timeoutSeconds: z.number().min(1).max(86400), // Max 1 day
   triggerType: z.enum(["MANUAL", "SCHEDULED", "EVENT"]),
@@ -83,7 +84,7 @@ const defaultValues: JobFormData = {
   workingDirectory: "",
   environmentVariables: "",
   isEnabled: true,
-  priority: 5,
+  priority: "NORMAL",
   maxRetries: 3,
   timeoutSeconds: 3600, // 1 hour
   triggerType: "MANUAL",
@@ -274,18 +275,18 @@ const JobFormPage: React.FC = () => {
                         <TextField
                           {...field}
                           label="Priority"
-                          type="number"
+                          select
                           fullWidth
-                          inputProps={{ min: 1, max: 10 }}
                           error={!!errors.priority}
                           helperText={
-                            errors.priority?.message ||
-                            "1 (lowest) to 10 (highest)"
+                            errors.priority?.message || "Job execution priority"
                           }
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value))
-                          }
-                        />
+                        >
+                          <MenuItem value="LOW">Low</MenuItem>
+                          <MenuItem value="NORMAL">Normal</MenuItem>
+                          <MenuItem value="HIGH">High</MenuItem>
+                          <MenuItem value="CRITICAL">Critical</MenuItem>
+                        </TextField>
                       )}
                     />
                   </Grid>

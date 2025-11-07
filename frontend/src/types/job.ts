@@ -18,10 +18,10 @@ export type ExecutionStatus =
 export type TriggerType = "MANUAL" | "SCHEDULED" | "EVENT";
 
 // Job status enum
-export type JobStatus = "ACTIVE" | "DISABLED" | "ARCHIVED";
+export type JobStatus = "ACTIVE" | "INACTIVE" | "PAUSED" | "DELETED";
 
-// Job priority as number (1-10)
-export type JobPriority = number;
+// Job priority enum matching backend
+export type JobPriority = "LOW" | "NORMAL" | "HIGH" | "CRITICAL";
 
 /**
  * Represents a single job execution instance
