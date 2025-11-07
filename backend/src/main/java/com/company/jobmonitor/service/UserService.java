@@ -196,6 +196,7 @@ public class UserService {
    * @return the updated user as a UserDto
    * @throws RuntimeException if the user is not found or email already exists
    */
+  @CacheEvict(value = "users", allEntries = true)
   public UserDto updateUserProfile(
       String username, String email, String firstName, String lastName) {
     User user =
@@ -229,6 +230,7 @@ public class UserService {
    * @throws RuntimeException if the user is not found or current password is invalid
    * @see #resetPassword(String, String) for administrative password resets
    */
+  @CacheEvict(value = "users", allEntries = true)
   public void changePassword(String username, String oldPassword, String newPassword) {
     User user =
         userRepository

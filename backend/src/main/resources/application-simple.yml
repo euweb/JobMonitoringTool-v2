@@ -10,9 +10,12 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 
-  # Disable security for now
+  # JWT Configuration
   security:
-    enabled: false
+    jwt:
+      secret: myVeryLongSecretKeyForJWTSigningThatIsAtLeast256BitsLong1234567890ABCDEFGHIJKLMNOP
+      access-token-validity: 900000 # 15 minutes
+      refresh-token-validity: 604800000 # 7 days
 
 # Server Configuration
 server:
