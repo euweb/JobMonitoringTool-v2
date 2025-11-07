@@ -1,19 +1,19 @@
 -- Insert default admin user
 -- Password: admin123 (hashed with BCrypt)
 INSERT INTO users (
-    username, 
-    email, 
-    password_hash, 
-    first_name, 
-    last_name, 
-    role, 
+    username,
+    email,
+    password_hash,
+    first_name,
+    last_name,
+    role,
     enabled,
     created_by,
     updated_by
 ) VALUES (
     'admin',
     'admin@jobmonitor.com',
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqyc3YJy3gEeezb3AbEVE.m',  -- admin123
+    '$2a$10$ey1jQj9vFhJsV.fGcZsZPeh.NJImCdW95pnB6Zro89W4sRbuYDJf6',  -- admin123 (korrekt)
     'System',
     'Administrator',
     'ADMIN',
@@ -46,7 +46,7 @@ INSERT INTO jobs (
     estimated_duration,
     priority,
     enabled
-) VALUES 
+) VALUES
     ('ETL_DAILY_SALES', 'Daily Sales ETL', 'Extract, transform and load daily sales data', 'ETL', 'DWH_SYSTEM', '0 2 * * *', 3600, 1, TRUE),
     ('BACKUP_DATABASE', 'Database Backup', 'Full database backup process', 'BACKUP', 'DWH_SYSTEM', '0 23 * * *', 1800, 2, TRUE),
     ('REPORT_GENERATOR', 'Daily Reports', 'Generate daily business reports', 'REPORT', 'REPORT_SYSTEM', '0 6 * * *', 900, 1, TRUE),
@@ -62,7 +62,7 @@ INSERT INTO job_chains (
     system_name,
     schedule_expression,
     enabled
-) VALUES 
+) VALUES
     ('DAILY_ETL_CHAIN', 'Daily ETL Processing Chain', 'Complete daily ETL workflow including validation and reporting', 'ETL_WORKFLOW', 'DWH_SYSTEM', '0 1 * * *', TRUE);
 
 -- Link jobs to job chain
@@ -71,7 +71,7 @@ INSERT INTO job_chain_jobs (
     job_id,
     execution_order,
     is_critical
-) VALUES 
+) VALUES
     ('DAILY_ETL_CHAIN', 'ETL_DAILY_SALES', 1, TRUE),
     ('DAILY_ETL_CHAIN', 'DATA_VALIDATION', 2, TRUE),
     ('DAILY_ETL_CHAIN', 'REPORT_GENERATOR', 3, FALSE),
@@ -88,7 +88,7 @@ INSERT INTO job_executions (
     duration,
     exit_code,
     triggered_by
-) VALUES 
+) VALUES
     ('ETL_DAILY_SALES', 'DAILY_ETL_CHAIN', 'ETL_20241105_001', 'SUCCESS', '2024-11-05 02:00:00', '2024-11-05 02:58:30', 3510, 0, 'scheduler'),
     ('DATA_VALIDATION', 'DAILY_ETL_CHAIN', 'VAL_20241105_001', 'SUCCESS', '2024-11-05 02:58:30', '2024-11-05 03:05:15', 405, 0, 'scheduler'),
     ('REPORT_GENERATOR', 'DAILY_ETL_CHAIN', 'RPT_20241105_001', 'RUNNING', '2024-11-05 03:05:15', NULL, NULL, NULL, 'scheduler'),
