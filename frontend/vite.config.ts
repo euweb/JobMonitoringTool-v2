@@ -1,13 +1,13 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { resolve } from "path";
+import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@": resolve(__dirname, "src"),
+      "@": path.resolve(process.cwd(), "src"),
     },
   },
   server: {
@@ -28,16 +28,28 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ["react", "react-dom"],
-          mui: ["@mui/material", "@mui/icons-material"],
+          "mui-core": ["@mui/material/styles", "@mui/material/colors"],
+          "mui-components": [
+            "@mui/material",
+            "@mui/icons-material",
+            "@mui/lab",
+          ],
+          "mui-data": ["@mui/x-data-grid"],
           router: ["react-router-dom"],
-          query: ["@tanstack/react-query"],
+          query: ["@tanstack/react-query", "@tanstack/react-query-devtools"],
+          charts: ["recharts"],
+          utils: [
+            "axios",
+            "zod",
+            "zustand",
+            "@hookform/resolvers",
+            "react-hook-form",
+          ],
         },
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: ["./src/test-setup.ts"],
+    target: "esnext",
+    minify: "esbuild",
+    chunkSizeWarningLimit: 600,
   },
 });
