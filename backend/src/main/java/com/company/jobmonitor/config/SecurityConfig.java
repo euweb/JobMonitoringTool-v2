@@ -80,8 +80,13 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/assets/**", "/static/**")
                     .permitAll()
+                    // Allow frontend routes for SPA
+                    .requestMatchers("/login", "/dashboard", "/admin", "/settings")
+                    .permitAll()
+                    .requestMatchers("/api/**")
+                    .authenticated()
                     .anyRequest()
-                    .authenticated());
+                    .permitAll());
 
     http.authenticationProvider(authenticationProvider());
     http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

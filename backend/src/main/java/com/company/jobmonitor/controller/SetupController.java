@@ -28,10 +28,24 @@ public class SetupController {
     Map<String, String> response = new HashMap<>();
 
     try {
+      // Clear existing users
+      userRepository.deleteAll();
+
+      // Generate fresh hashes
+      String admin123Hash = passwordEncoder.encode("admin123");
+      String user123Hash = passwordEncoder.encode("user123");
+      String testPasswordHash = passwordEncoder.encode("testpassword");
+
+      // Log the hashes for debugging
+      System.out.println("Generated hashes:");
+      System.out.println("admin123: " + admin123Hash);
+      System.out.println("user123: " + user123Hash);
+      System.out.println("testpassword: " + testPasswordHash);
+
       // Create admin user
       User admin = new User();
       admin.setUsername("admin");
-      admin.setPasswordHash(passwordEncoder.encode("admin123"));
+      admin.setPasswordHash(admin123Hash); // Use the generated hash
       admin.setEmail("admin@jobmonitor.com");
       admin.setFirstName("System");
       admin.setLastName("Administrator");
@@ -91,5 +105,21 @@ public class SetupController {
     }
 
     return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/generate-hash")
+  public ResponseEntity<String> generateHash(
+      @org.springframework.web.bind.annotation.RequestParam String password) {
+    String hash = passwordEncoder.encode(password);
+    System.out.println("Password: " + password + " -> Hash: " + hash);
+    return ResponseEntity.ok("Password: " + password + "\nHash: " + hash);
+  }
+
+  @PostMapping("/test-password")
+  public ResponseEntity<String> testPassword(
+      @org.springframework.web.bind.annotation.RequestParam String password,
+      @org.springframework.web.bind.annotation.RequestParam String hash) {
+    boolean matches = passwordEncoder.matches(password, hash);
+    return ResponseEntity.ok("Password '" + password + "' matches hash: " + matches);
   }
 }
