@@ -37,6 +37,10 @@ import {
   Button,
   Stack,
   Collapse,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   PlayArrow as RunningIcon,
@@ -120,6 +124,8 @@ const ImportedJobsPage: React.FC = () => {
   const [filters, setFilters] = useState<ExecutionFilters>({});
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [jobChainData, setJobChainData] = useState<any>(null);
+  const [showJobChain, setShowJobChain] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -248,6 +254,23 @@ const ImportedJobsPage: React.FC = () => {
       }
     },
     [favorites, addToFavoritesMutation, removeFromFavoritesMutation],
+  );
+
+  // Handle job chain view
+  const handleJobChainView = useCallback(
+    async (executionId: number, event: React.MouseEvent) => {
+      event.stopPropagation(); // Prevent row expansion
+
+      try {
+        const chainData = await importedJobService.getJobChain(executionId);
+        setJobChainData(chainData);
+        setShowJobChain(true);
+      } catch (error) {
+        console.error("Failed to fetch job chain:", error);
+        // TODO: Show error message to user
+      }
+    },
+    [],
   );
 
   // Get unique values for filter dropdowns
@@ -573,7 +596,15 @@ const ImportedJobsPage: React.FC = () => {
                             <Stack direction="row" spacing={1}>
                               {execution.parentExecutionId && (
                                 <Tooltip title="View Job Chain">
-                                  <IconButton size="small">
+                                  <IconButton
+                                    size="small"
+                                    onClick={(e) =>
+                                      handleJobChainView(
+                                        execution.executionId,
+                                        e,
+                                      )
+                                    }
+                                  >
                                     <ChainIcon fontSize="small" />
                                   </IconButton>
                                 </Tooltip>
@@ -733,6 +764,51 @@ const ImportedJobsPage: React.FC = () => {
             : "Unknown error"}
         </Alert>
       )}
+
+      {/* Job Chain Dialog */}
+      <Dialog
+        open={showJobChain}
+        onClose={() => setShowJobChain(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Job Chain Visualization</DialogTitle>
+        <DialogContent>
+          {jobChainData ? (
+            <Box>
+              <Typography variant="h6" gutterBottom>
+                Root Job: {jobChainData.rootExecution?.jobName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Execution ID: {jobChainData.rootExecution?.executionId}
+              </Typography>
+              {jobChainData.children && jobChainData.children.length > 0 && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Child Jobs:
+                  </Typography>
+                  {jobChainData.children.map((child: any, index: number) => (
+                    <Box key={index} sx={{ ml: 2, mb: 1 }}>
+                      <Typography variant="body2">
+                        • {child.execution?.jobName} (ID:{" "}
+                        {child.execution?.executionId})
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Status: {child.execution?.status}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          ) : (
+            <CircularProgress />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowJobChain(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
