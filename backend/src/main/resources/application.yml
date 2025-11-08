@@ -37,19 +37,18 @@ spring:
   security:
     jwt:
       secret: myVeryLongSecretKeyForJWTSigningThatIsAtLeast256BitsLong1234567890ABCDEFGHIJKLMNOP
-      access-token-validity: 900000 # 15 minutes in milliseconds
-      refresh-token-validity: 604800000 # 7 days in milliseconds
+      access-token-validity: 900000
+      refresh-token-validity: 604800000
 
   # Web Configuration
   web:
     resources:
       static-locations: classpath:/static/
+      add-mappings: false
 
   # Error handling for SPA
   mvc:
     throw-exception-if-no-handler-found: true
-  resources:
-    add-mappings: false
 
   # Actuator
   management:
@@ -75,7 +74,7 @@ logging:
 server:
   port: 8080
 
-# Application Specific Configuration
+# Application Configuration
 app:
   cors:
     allowed-origins: http://localhost:5173,http://localhost:3000
@@ -88,13 +87,21 @@ app:
     default-password: admin123
     default-email: admin@jobmonitor.com
 
+  # CSV Import Configuration
+  csv:
+    import:
+      directory: ./import
+      processed-directory: ./import/processed
+      schedule:
+        cron: "0 */5 * * * *"
+
   job-import:
     csv:
       upload-dir: ./data/uploads
       max-file-size: 10MB
     schedule:
       enabled: true
-      cron: "0 */5 * * * *" # Every 5 minutes
+      cron: "0 */5 * * * *"
 ---
 # Development Profile
 spring:
@@ -127,11 +134,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    properties:
-      hibernate:
-        show_sql: false
-
-logging:
-  level:
-    root: INFO
-    com.company.jobmonitor: INFO

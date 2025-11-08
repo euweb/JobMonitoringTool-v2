@@ -61,8 +61,8 @@ const getStatusColor = (status: ExecutionStatus | JobStatus) => {
     case "QUEUED":
     case "RETRYING":
       return "warning";
-    case "DISABLED":
-    case "ARCHIVED":
+    case "INACTIVE":
+    case "DELETED":
       return "default";
     default:
       return "default";
