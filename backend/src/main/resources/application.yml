@@ -50,6 +50,25 @@ spring:
   mvc:
     throw-exception-if-no-handler-found: true
 
+  # Spring Mail Configuration
+  mail:
+    # For development without Docker - use console logging
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
+        debug: true
+    # Alternative: Use file-based or console logging for development
+    test-connection: false
+
   # Actuator
   management:
     endpoints:
@@ -94,6 +113,16 @@ app:
       processed-directory: ./import/processed
       schedule:
         cron: "0 */5 * * * *"
+
+  # Hotfolder Configuration
+  hotfolder:
+    enabled: true
+
+  # Notification Configuration
+  notification:
+    enabled: true
+    from-email: noreply@jobmonitor.com
+    subject-prefix: "[Job Monitor]"
 
   job-import:
     csv:

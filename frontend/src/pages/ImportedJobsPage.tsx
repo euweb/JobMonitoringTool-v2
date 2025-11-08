@@ -159,12 +159,19 @@ const ImportedJobsPage: React.FC = () => {
   const { data: favoritesData } = useQuery({
     queryKey: ["user-favorites"],
     queryFn: () => importedJobService.getFavorites(),
-    onSuccess: (data) => {
-      // Extract job names from favorites and update state
-      const favoriteJobNames = new Set(data?.map((fav) => fav.jobName) || []);
-      setFavorites(favoriteJobNames);
-    },
   });
+
+  // Update favorites state when data changes
+  React.useEffect(() => {
+    if (favoritesData) {
+      console.log("Favorites data loaded:", favoritesData);
+      const favoriteJobNames = new Set(
+        favoritesData.map((fav) => fav.favorite?.jobName).filter(Boolean) || [],
+      );
+      console.log("Extracted job names:", Array.from(favoriteJobNames));
+      setFavorites(favoriteJobNames);
+    }
+  }, [favoritesData]);
 
   // Manual import trigger
   const importMutation = useMutation({
@@ -183,6 +190,10 @@ const ImportedJobsPage: React.FC = () => {
       setFavorites((prev) => new Set(prev).add(jobName));
       queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
     },
+    onError: (error) => {
+      console.error("Failed to add to favorites:", error);
+      // TODO: Show error message to user
+    },
   });
 
   const removeFromFavoritesMutation = useMutation({
@@ -195,6 +206,10 @@ const ImportedJobsPage: React.FC = () => {
         return newFavorites;
       });
       queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+    },
+    onError: (error) => {
+      console.error("Failed to remove from favorites:", error);
+      // TODO: Show error message to user
     },
   });
 

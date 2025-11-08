@@ -7,6 +7,7 @@ import com.company.jobmonitor.repository.ImportedJobExecutionRepository;
 import com.company.jobmonitor.repository.JobFavoriteRepository;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,8 +117,11 @@ public class ImportedJobService {
 
   /** Add job to favorites */
   public JobFavorite addToFavorites(String jobName, Integer userId) {
-    if (favoriteRepository.existsByUserIdAndJobName(userId, jobName)) {
-      throw new IllegalArgumentException("Job is already in favorites");
+    // Check if already exists and return existing favorite
+    Optional<JobFavorite> existingFavorite =
+        favoriteRepository.findByUserIdAndJobName(userId, jobName);
+    if (existingFavorite.isPresent()) {
+      return existingFavorite.get();
     }
 
     JobFavorite favorite = new JobFavorite(jobName, userId);

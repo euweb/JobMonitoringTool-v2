@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,8 @@ public class CsvImportService {
   private static final Logger logger = LoggerFactory.getLogger(CsvImportService.class);
 
   @Autowired private ImportedJobExecutionRepository executionRepository;
+
+  @Autowired private ApplicationEventPublisher eventPublisher;
 
   @Value("${app.csv.import.directory:./import}")
   private String importDirectory;
@@ -97,6 +100,7 @@ public class CsvImportService {
     logger.info("Starting import of CSV file: {}", csvFile.getFileName());
 
     List<ImportedJobExecution> executionsToSave = new ArrayList<>();
+    List<Long> newExecutionIds = new ArrayList<>();
     int lineNumber = 0;
     int newCount = 0;
     int updatedCount = 0;
@@ -126,6 +130,7 @@ public class CsvImportService {
             } else {
               // New execution
               executionsToSave.add(execution);
+              newExecutionIds.add(execution.getExecutionId());
               newCount++;
               logger.debug("New execution {}", execution.getExecutionId());
             }
@@ -142,7 +147,18 @@ public class CsvImportService {
 
     // Batch save executions (new and updated)
     if (!executionsToSave.isEmpty()) {
-      executionRepository.saveAll(executionsToSave);
+      List<ImportedJobExecution> savedExecutions = executionRepository.saveAll(executionsToSave);
+
+      // Fire events for new and updated executions
+      for (ImportedJobExecution execution : savedExecutions) {
+        if (newExecutionIds.contains(execution.getExecutionId())) {
+          eventPublisher.publishEvent(
+              new JobExecutionEvent(this, execution, JobExecutionEvent.EventType.CREATED));
+        } else {
+          eventPublisher.publishEvent(
+              new JobExecutionEvent(this, execution, JobExecutionEvent.EventType.UPDATED));
+        }
+      }
     }
 
     logger.info(

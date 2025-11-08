@@ -88,6 +88,12 @@
             <version>5.9</version>
         </dependency>
 
+        <!-- Email -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- Documentation -->
         <dependency>
             <groupId>org.springdoc</groupId>

@@ -49,6 +49,10 @@ public interface ImportedJobExecutionRepository extends JpaRepository<ImportedJo
   /** Find child executions for a parent execution ID */
   List<ImportedJobExecution> findByParentExecutionIdOrderByExecutionIdDesc(Long parentExecutionId);
 
+  /** Find executions by job name, status and import timestamp for notifications */
+  List<ImportedJobExecution> findByJobNameAndStatusAndImportTimestampAfter(
+      String jobName, String status, LocalDateTime after);
+
   /** Get execution statistics for a job */
   @Query(
       "SELECT COUNT(e), SUM(CASE WHEN e.status = 'DONE' THEN 1 ELSE 0 END), SUM(CASE WHEN e.status"

@@ -116,12 +116,8 @@ public class ImportedJobController {
   public ResponseEntity<JobFavorite> addToFavorites(
       @PathVariable String jobName, @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-    try {
-      JobFavorite favorite = importedJobService.addToFavorites(jobName, userPrincipal.getId());
-      return ResponseEntity.ok(favorite);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().build();
-    }
+    JobFavorite favorite = importedJobService.addToFavorites(jobName, userPrincipal.getId());
+    return ResponseEntity.ok(favorite);
   }
 
   /** Remove job from favorites */
