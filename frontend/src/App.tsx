@@ -12,6 +12,7 @@ const UserSettings = React.lazy(() => import("./pages/UserSettings"));
 const JobsPage = React.lazy(() => import("./pages/JobsPage"));
 const JobDetailsPage = React.lazy(() => import("./pages/JobDetailsPage"));
 const JobFormPage = React.lazy(() => import("./pages/JobFormPage"));
+const ImportedJobsPage = React.lazy(() => import("./pages/ImportedJobsPage"));
 
 const App: React.FC = () => {
   const { isAuthenticated } = useAuthStore();
@@ -36,6 +37,7 @@ const App: React.FC = () => {
           <Route path="/jobs/new" element={<JobFormPage />} />
           <Route path="/jobs/:id" element={<JobDetailsPage />} />
           <Route path="/jobs/:id/edit" element={<JobFormPage />} />
+          <Route path="/imported-jobs" element={<ImportedJobsPage />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/settings" element={<UserSettings />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

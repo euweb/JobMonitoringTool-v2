@@ -1,5 +1,6 @@
 package com.company.jobmonitor.service;
 
+import com.company.jobmonitor.dto.PagedResponse;
 import com.company.jobmonitor.entity.ImportedJobExecution;
 import com.company.jobmonitor.entity.JobFavorite;
 import com.company.jobmonitor.repository.ImportedJobExecutionRepository;
@@ -245,5 +246,42 @@ public class ImportedJobService {
               return node;
             })
         .collect(Collectors.toList());
+  }
+
+  /** Get all executions with filtering and pagination */
+  public PagedResponse<ImportedJobExecution> getExecutions(
+      int page,
+      int size,
+      String jobName,
+      String status,
+      String jobType,
+      String host,
+      String submittedBy) {
+
+    org.springframework.data.domain.Pageable pageable =
+        org.springframework.data.domain.PageRequest.of(page, size);
+
+    Page<ImportedJobExecution> pageResult =
+        executionRepository.findExecutionsWithFilters(
+            jobName, status, jobType, host, submittedBy, pageable);
+
+    return new PagedResponse<>(
+        pageResult.getContent(),
+        pageResult.getNumber(),
+        pageResult.getSize(),
+        pageResult.getTotalElements(),
+        pageResult.getTotalPages(),
+        pageResult.isFirst(),
+        pageResult.isLast());
+  }
+
+  /** Get filter options for dropdowns */
+  public Map<String, List<String>> getFilterOptions() {
+    Map<String, List<String>> filters = new HashMap<>();
+    filters.put("statuses", executionRepository.findDistinctStatuses());
+    filters.put("jobTypes", executionRepository.findDistinctJobTypes());
+    filters.put("hosts", executionRepository.findDistinctHosts());
+    filters.put("submitters", executionRepository.findDistinctSubmitters());
+    return filters;
   }
 }

@@ -67,4 +67,40 @@ public interface ImportedJobExecutionRepository extends JpaRepository<ImportedJo
 
   /** Check if execution ID already exists (prevent duplicates) */
   boolean existsByExecutionId(Long executionId);
+
+  /** Find executions with filtering and pagination support using @Query */
+  @Query(
+      "SELECT e FROM ImportedJobExecution e WHERE (:jobName IS NULL OR LOWER(e.jobName) LIKE"
+          + " LOWER(CONCAT('%', :jobName, '%'))) AND (:status IS NULL OR e.status = :status) AND"
+          + " (:jobType IS NULL OR LOWER(e.jobType) LIKE LOWER(CONCAT('%', :jobType, '%'))) AND"
+          + " (:host IS NULL OR LOWER(e.host) LIKE LOWER(CONCAT('%', :host, '%'))) AND"
+          + " (:submittedBy IS NULL OR LOWER(e.submittedBy) LIKE LOWER(CONCAT('%', :submittedBy,"
+          + " '%'))) ORDER BY e.executionId DESC")
+  org.springframework.data.domain.Page<ImportedJobExecution> findExecutionsWithFilters(
+      @Param("jobName") String jobName,
+      @Param("status") String status,
+      @Param("jobType") String jobType,
+      @Param("host") String host,
+      @Param("submittedBy") String submittedBy,
+      org.springframework.data.domain.Pageable pageable);
+
+  /** Get distinct values for filter dropdowns */
+  @Query(
+      "SELECT DISTINCT e.status FROM ImportedJobExecution e WHERE e.status IS NOT NULL ORDER BY"
+          + " e.status")
+  List<String> findDistinctStatuses();
+
+  @Query(
+      "SELECT DISTINCT e.jobType FROM ImportedJobExecution e WHERE e.jobType IS NOT NULL ORDER BY"
+          + " e.jobType")
+  List<String> findDistinctJobTypes();
+
+  @Query(
+      "SELECT DISTINCT e.host FROM ImportedJobExecution e WHERE e.host IS NOT NULL ORDER BY e.host")
+  List<String> findDistinctHosts();
+
+  @Query(
+      "SELECT DISTINCT e.submittedBy FROM ImportedJobExecution e WHERE e.submittedBy IS NOT NULL"
+          + " ORDER BY e.submittedBy")
+  List<String> findDistinctSubmitters();
 }

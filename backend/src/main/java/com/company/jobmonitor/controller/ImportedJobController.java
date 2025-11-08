@@ -1,5 +1,6 @@
 package com.company.jobmonitor.controller;
 
+import com.company.jobmonitor.dto.PagedResponse;
 import com.company.jobmonitor.entity.ImportedJobExecution;
 import com.company.jobmonitor.entity.JobFavorite;
 import com.company.jobmonitor.security.UserPrincipal;
@@ -46,6 +47,30 @@ public class ImportedJobController {
     }
 
     return ResponseEntity.ok(jobDetails);
+  }
+
+  /** Get all executions with filtering and pagination */
+  @GetMapping("/executions")
+  public ResponseEntity<PagedResponse<ImportedJobExecution>> getExecutions(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "20") int size,
+      @RequestParam(required = false) String jobName,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) String jobType,
+      @RequestParam(required = false) String host,
+      @RequestParam(required = false) String submittedBy) {
+
+    PagedResponse<ImportedJobExecution> executions =
+        importedJobService.getExecutions(page, size, jobName, status, jobType, host, submittedBy);
+
+    return ResponseEntity.ok(executions);
+  }
+
+  /** Get filter options for dropdowns */
+  @GetMapping("/executions/filters")
+  public ResponseEntity<Map<String, List<String>>> getFilterOptions() {
+    Map<String, List<String>> filters = importedJobService.getFilterOptions();
+    return ResponseEntity.ok(filters);
   }
 
   /** Get execution details by ID */
