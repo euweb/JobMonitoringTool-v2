@@ -36,3 +36,4 @@ backend/src/main/resources/static/*
 
 # Database Files
 */jobmonitor.db
+*.csv
