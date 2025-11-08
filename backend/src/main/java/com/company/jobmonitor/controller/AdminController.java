@@ -4,6 +4,8 @@ import com.company.jobmonitor.dto.MessageResponse;
 import com.company.jobmonitor.dto.SignUpRequest;
 import com.company.jobmonitor.dto.UserDto;
 import com.company.jobmonitor.entity.User;
+import com.company.jobmonitor.service.HotfolderService;
+import com.company.jobmonitor.service.NotificationService;
 import com.company.jobmonitor.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -47,9 +51,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
 
   private final UserService userService;
+  private final HotfolderService hotfolderService;
+  private final NotificationService notificationService;
 
-  public AdminController(UserService userService) {
+  public AdminController(
+      UserService userService,
+      HotfolderService hotfolderService,
+      NotificationService notificationService) {
     this.userService = userService;
+    this.hotfolderService = hotfolderService;
+    this.notificationService = notificationService;
   }
 
   /**
@@ -411,12 +422,98 @@ public class AdminController {
   }
 
   /**
-   * Retrieves system statistics for administrative dashboard.
+   * Get hotfolder status
    *
-   * <p>Provides key metrics including total user count and overall system status for monitoring and
-   * administrative purposes.
+   * @apiNote GET /api/admin/hotfolder/status
+   */
+  @Operation(summary = "Get hotfolder monitoring status")
+  @GetMapping("/hotfolder/status")
+  public ResponseEntity<Map<String, Object>> getHotfolderStatus() {
+    Map<String, Object> status = new HashMap<>();
+    status.put("monitoring", hotfolderService.isMonitoringActive());
+    status.put("importDirectory", hotfolderService.getImportDirectory());
+    return ResponseEntity.ok(status);
+  }
+
+  /**
+   * Start hotfolder monitoring
    *
-   * @return ResponseEntity containing a map of system statistics
+   * @apiNote POST /api/admin/hotfolder/start
+   */
+  @Operation(summary = "Start hotfolder monitoring")
+  @PostMapping("/hotfolder/start")
+  public ResponseEntity<Map<String, String>> startHotfolderMonitoring() {
+    try {
+      hotfolderService.startHotfolderMonitoring();
+      Map<String, String> response = new HashMap<>();
+      response.put("message", "Hotfolder monitoring started successfully");
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> response = new HashMap<>();
+      response.put("error", "Failed to start hotfolder monitoring: " + e.getMessage());
+      return ResponseEntity.badRequest().body(response);
+    }
+  }
+
+  /**
+   * Stop hotfolder monitoring
+   *
+   * @apiNote POST /api/admin/hotfolder/stop
+   */
+  @Operation(summary = "Stop hotfolder monitoring")
+  @PostMapping("/hotfolder/stop")
+  public ResponseEntity<Map<String, String>> stopHotfolderMonitoring() {
+    hotfolderService.stopHotfolderMonitoring();
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Hotfolder monitoring stopped successfully");
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Manually process all CSV files
+   *
+   * @apiNote POST /api/admin/hotfolder/process-all
+   */
+  @Operation(summary = "Process all CSV files in import directory")
+  @PostMapping("/hotfolder/process-all")
+  public ResponseEntity<Map<String, Object>> processAllCsvFiles() {
+    try {
+      int imported = hotfolderService.processAllCsvFiles();
+      Map<String, Object> response = new HashMap<>();
+      response.put("message", "Successfully processed CSV files");
+      response.put("imported", imported);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, Object> response = new HashMap<>();
+      response.put("error", "Failed to process CSV files: " + e.getMessage());
+      return ResponseEntity.badRequest().body(response);
+    }
+  }
+
+  /**
+   * Send test notification
+   *
+   * @apiNote POST /api/admin/notification/test
+   */
+  @Operation(summary = "Send test notification email")
+  @PostMapping("/notification/test")
+  public ResponseEntity<Map<String, String>> sendTestNotification(@RequestParam String email) {
+    try {
+      notificationService.sendTestNotification(email);
+      Map<String, String> response = new HashMap<>();
+      response.put("message", "Test notification sent successfully to " + email);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      Map<String, String> response = new HashMap<>();
+      response.put("error", "Failed to send test notification: " + e.getMessage());
+      return ResponseEntity.badRequest().body(response);
+    }
+  }
+
+  /**
+   * Get system admin statistics including hotfolder and notification status
+   *
+   * @return Statistics data including user count, system status, hotfolder monitoring status
    * @apiNote GET /api/admin/stats
    */
   @Operation(
@@ -431,8 +528,11 @@ public class AdminController {
   })
   @GetMapping("/stats")
   public ResponseEntity<Map<String, Object>> getAdminStats() {
-    Map<String, Object> stats =
-        Map.of("totalUsers", userService.getUserCount(), "systemStatus", "Operational");
+    Map<String, Object> stats = new HashMap<>();
+    stats.put("totalUsers", userService.getUserCount());
+    stats.put("systemStatus", "Operational");
+    stats.put("hotfolderMonitoring", hotfolderService.isMonitoringActive());
+    stats.put("importDirectory", hotfolderService.getImportDirectory());
     return ResponseEntity.ok(stats);
   }
 }

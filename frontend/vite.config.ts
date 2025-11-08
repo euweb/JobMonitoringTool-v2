@@ -29,11 +29,7 @@ export default defineConfig({
         manualChunks: {
           vendor: ["react", "react-dom"],
           "mui-core": ["@mui/material/styles", "@mui/material/colors"],
-          "mui-components": [
-            "@mui/material",
-            "@mui/icons-material",
-            "@mui/lab",
-          ],
+          "mui-components": ["@mui/material", "@mui/icons-material"],
           "mui-data": ["@mui/x-data-grid"],
           router: ["react-router-dom"],
           query: ["@tanstack/react-query", "@tanstack/react-query-devtools"],

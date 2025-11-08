@@ -1,0 +1,44 @@
+# Development Configuration for local testing
+spring:
+  # Email Configuration for Development
+  mail:
+    # Mock SMTP for development
+    host: localhost
+    port: 2525
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+        debug: true
+    test-connection: false
+
+# Application Configuration for Development
+app:
+  # Notification Configuration for Development
+  notification:
+    enabled: true
+    from-email: dev@jobmonitor.local
+    subject-prefix: "[Job Monitor DEV]"
+    # Mock mode for development - logs emails instead of sending
+    mock-mode: true
+
+  # Hotfolder Configuration for Development
+  hotfolder:
+    enabled: true
+
+  # CSV Import Configuration
+  csv:
+    import:
+      directory: ./import
+      processed-directory: ./import/processed
+
+# Logging for development
+logging:
+  level:
+    com.company.jobmonitor: DEBUG
+    org.springframework.mail: DEBUG
+    root: INFO

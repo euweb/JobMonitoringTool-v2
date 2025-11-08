@@ -49,6 +49,13 @@ npm install  # Nur beim ersten Mal oder bei neuen Dependencies
 npm run dev
 ```
 
+falls der Build fehl schlägt:
+
+```bash
+npm install patch-package --save-dev
+npm run build
+```
+
 **Frontend läuft auf:** http://localhost:5173
 
 **Features im Dev-Modus:**

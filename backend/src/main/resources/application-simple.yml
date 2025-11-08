@@ -10,13 +10,37 @@ spring:
       - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
       - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 
-  # Disable security for now
+  # JWT Configuration
   security:
-    enabled: false
+    jwt:
+      secret: myVeryLongSecretKeyForJWTSigningThatIsAtLeast256BitsLong1234567890ABCDEFGHIJKLMNOP
+      access-token-validity: 900000 # 15 minutes
+      refresh-token-validity: 604800000 # 7 days
 
 # Server Configuration
 server:
   port: 8080
+
+# Application Configuration
+app:
+  cors:
+    allowed-origins: http://localhost:5173,http://localhost:3000
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    max-age: 3600
+
+  admin:
+    default-username: admin
+    default-password: admin123
+    default-email: admin@jobmonitor.com
+
+  # CSV Import Configuration (relative paths)
+  csv:
+    import:
+      directory: ./import
+      processed-directory: ./import/processed
+      schedule:
+        cron: "0 */5 * * * *"
   servlet:
     context-path: /
 
