@@ -177,6 +177,24 @@ export class ImportedJobService {
   }
 
   /**
+   * Update favorite notification settings
+   */
+  async updateFavoriteSettings(
+    jobName: string,
+    settings: {
+      notifyOnFailure?: boolean;
+      notifyOnSuccess?: boolean;
+      notifyOnStart?: boolean;
+    },
+  ): Promise<any> {
+    const response = await apiClient.put(
+      `/imported-jobs/${jobName}/favorite/settings`,
+      settings,
+    );
+    return response.data;
+  }
+
+  /**
    * Trigger manual CSV import
    */
   async triggerImport(): Promise<{ imported: number; message: string }> {
