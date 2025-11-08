@@ -1,6 +1,17 @@
 {
   "java.configuration.updateBuildConfiguration": "interactive",
   "java.compile.nullAnalysis.mode": "automatic",
+
+  // CRITICAL: Force VS Code to use -parameters flag and disable auto compilation
+  "java.jdt.ls.vmargs": "-Dfile.encoding=UTF-8 -Xmx2G",
+  "java.compile.enablePreviewFeatures": false,
+  "java.autobuild.enabled": false,
+  "java.compile.compileOnSave.enabled": false,
+
+  // Force Maven to be used for compilation instead of VS Code internal compiler
+  "java.eclipse.buildship.gradle.enabled": false,
+  "java.maven.updateSnapshots": false,
+
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,

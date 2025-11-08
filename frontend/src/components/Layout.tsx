@@ -21,6 +21,8 @@ import {
   AdminPanelSettings as AdminIcon,
   Settings as SettingsIcon,
   Logout as LogoutIcon,
+  Work as JobIcon,
+  CloudDownload as ImportIcon,
 } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
@@ -105,6 +107,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
    */
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+    { text: "Jobs", icon: <JobIcon />, path: "/jobs" },
+    { text: "Imported Jobs", icon: <ImportIcon />, path: "/imported-jobs" },
     ...(user?.role === "ADMIN"
       ? [{ text: "Admin Panel", icon: <AdminIcon />, path: "/admin" }]
       : []),
@@ -128,7 +132,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <ListItem
             key={item.path}
             button
-            selected={location.pathname === item.path}
+            selected={
+              location.pathname === item.path ||
+              location.pathname.startsWith(item.path)
+            }
             onClick={() => navigate(item.path)}
           >
             <ListItemIcon>{item.icon}</ListItemIcon>
