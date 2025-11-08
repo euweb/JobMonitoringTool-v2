@@ -170,6 +170,28 @@ const ImportedJobsPage: React.FC = () => {
     },
   });
 
+  // Favoriten-Mutations
+  const addToFavoritesMutation = useMutation({
+    mutationFn: (jobName: string) => importedJobService.addToFavorites(jobName),
+    onSuccess: (data, jobName) => {
+      setFavorites((prev) => new Set(prev).add(jobName));
+      queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+    },
+  });
+
+  const removeFromFavoritesMutation = useMutation({
+    mutationFn: (jobName: string) =>
+      importedJobService.removeFromFavorites(jobName),
+    onSuccess: (data, jobName) => {
+      setFavorites((prev) => {
+        const newFavorites = new Set(prev);
+        newFavorites.delete(jobName);
+        return newFavorites;
+      });
+      queryClient.invalidateQueries({ queryKey: ["user-favorites"] });
+    },
+  });
+
   // Handle pagination
   const handlePageChange = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
@@ -213,6 +235,20 @@ const ImportedJobsPage: React.FC = () => {
       return newSet;
     });
   }, []);
+
+  // Handle favorite toggle
+  const handleFavoriteToggle = useCallback(
+    (jobName: string, event: React.MouseEvent) => {
+      event.stopPropagation(); // Prevent row expansion
+
+      if (favorites.has(jobName)) {
+        removeFromFavoritesMutation.mutate(jobName);
+      } else {
+        addToFavoritesMutation.mutate(jobName);
+      }
+    },
+    [favorites, addToFavoritesMutation, removeFromFavoritesMutation],
+  );
 
   // Get unique values for filter dropdowns
   const uniqueValues = useMemo(() => {
@@ -542,9 +578,29 @@ const ImportedJobsPage: React.FC = () => {
                                   </IconButton>
                                 </Tooltip>
                               )}
-                              <Tooltip title="Add to Favorites">
-                                <IconButton size="small">
-                                  <FavoriteBorderIcon fontSize="small" />
+                              <Tooltip
+                                title={
+                                  favorites.has(execution.jobName)
+                                    ? "Remove from Favorites"
+                                    : "Add to Favorites"
+                                }
+                              >
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) =>
+                                    handleFavoriteToggle(execution.jobName, e)
+                                  }
+                                  color={
+                                    favorites.has(execution.jobName)
+                                      ? "error"
+                                      : "default"
+                                  }
+                                >
+                                  {favorites.has(execution.jobName) ? (
+                                    <FavoriteIcon fontSize="small" />
+                                  ) : (
+                                    <FavoriteBorderIcon fontSize="small" />
+                                  )}
                                 </IconButton>
                               </Tooltip>
                             </Stack>
