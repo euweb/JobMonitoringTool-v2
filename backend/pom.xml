@@ -158,6 +158,7 @@
                     <!-- Install Node.js and npm -->
                     <execution>
                         <id>install node and npm</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>install-node-and-npm</goal>
                         </goals>
@@ -170,6 +171,7 @@
                     <!-- Install npm dependencies -->
                     <execution>
                         <id>npm install</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
@@ -178,14 +180,27 @@
                         </configuration>
                     </execution>
 
-                    <!-- Build frontend -->
+                    <!-- Clean frontend dist -->
                     <execution>
-                        <id>npm run build</id>
+                        <id>clean frontend</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>npm</goal>
                         </goals>
                         <configuration>
-                            <arguments>run build</arguments>
+                            <arguments>run clean</arguments>
+                        </configuration>
+                    </execution>
+
+                    <!-- Build frontend -->
+                    <execution>
+                        <id>npm run build</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>run build:maven</arguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -199,12 +214,14 @@
                 <executions>
                     <execution>
                         <id>copy-frontend-build</id>
-                        <phase>process-resources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.outputDirectory}/static</outputDirectory>
+                            <!-- Clear target directory before copying -->
+                            <overwrite>true</overwrite>
                             <resources>
                                 <resource>
                                     <directory>../frontend/dist</directory>

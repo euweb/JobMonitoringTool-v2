@@ -3,19 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <parent>
         <groupId>com.company</groupId>
         <artifactId>job-monitoring-tool</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    
+
     <artifactId>job-monitoring-frontend</artifactId>
     <packaging>pom</packaging>
-    
+
     <name>Job Monitoring Frontend</name>
     <description>React/TypeScript frontend for Job Monitoring Tool</description>
-    
+
     <build>
         <plugins>
             <!-- Frontend Build Plugin -->
@@ -36,7 +36,7 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                     </execution>
-                    
+
                     <!-- npm install -->
                     <execution>
                         <id>npm install</id>
@@ -47,19 +47,19 @@
                             <arguments>install</arguments>
                         </configuration>
                     </execution>
-                    
+
                     <!-- npm run build -->
                     <execution>
                         <id>npm build</id>
                         <goals>
                             <goal>npm</goal>
                         </goals>
-                        <phase>compile</phase>
+                        <phase>none</phase>
                         <configuration>
                             <arguments>run build</arguments>
                         </configuration>
                     </execution>
-                    
+
                     <!-- npm run test -->
                     <execution>
                         <id>npm test</id>
