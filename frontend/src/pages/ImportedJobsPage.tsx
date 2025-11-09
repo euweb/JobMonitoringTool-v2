@@ -54,6 +54,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Timeline as ChainIcon,
+  AccountTree as AccountTreeIcon,
 } from "@mui/icons-material";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -784,46 +785,221 @@ const ImportedJobsPage: React.FC = () => {
       <Dialog
         open={showJobChain}
         onClose={() => setShowJobChain(false)}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
       >
-        <DialogTitle>Job Chain Visualization</DialogTitle>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={1}>
+            <AccountTreeIcon />
+            Job Chain Visualization
+          </Box>
+        </DialogTitle>
         <DialogContent>
           {jobChainData ? (
-            <Box>
-              <Typography variant="h6" gutterBottom>
-                Root Job: {jobChainData.rootExecution?.jobName}
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Execution ID: {jobChainData.rootExecution?.executionId}
-              </Typography>
-              {jobChainData.children && jobChainData.children.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Child Jobs:
-                  </Typography>
-                  {jobChainData.children.map((child: any, index: number) => (
-                    <Box key={index} sx={{ ml: 2, mb: 1 }}>
-                      <Typography variant="body2">
-                        • {child.execution?.jobName} (ID:{" "}
-                        {child.execution?.executionId})
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Status: {child.execution?.status}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Box>
+            <JobChainVisualization
+              rootExecution={jobChainData.rootExecution}
+              chainTree={jobChainData.chainTree}
+            />
           ) : (
-            <CircularProgress />
+            <Box display="flex" justifyContent="center" p={4}>
+              <CircularProgress />
+            </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowJobChain(false)}>Close</Button>
         </DialogActions>
       </Dialog>
+    </Box>
+  );
+};
+
+/**
+ * Job Chain Visualization Component
+ */
+interface JobChainVisualizationProps {
+  rootExecution: ImportedJobExecution;
+  chainTree: Array<{
+    execution: ImportedJobExecution;
+    children: Array<any>;
+  }>;
+}
+
+const JobChainVisualization: React.FC<JobChainVisualizationProps> = ({
+  rootExecution,
+  chainTree,
+}) => {
+  const renderJobNode = (
+    execution: ImportedJobExecution,
+    level: number = 0,
+  ) => {
+    const statusInfo = getStatusInfo(execution.status);
+
+    return (
+      <Card
+        key={execution.executionId}
+        variant="outlined"
+        sx={{
+          mb: 1,
+          ml: level * 4,
+          borderLeft: level > 0 ? "3px solid #e0e0e0" : "none",
+        }}
+      >
+        <CardContent sx={{ py: 2 }}>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+          >
+            <Box flex={1}>
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <Typography variant="h6" component="div">
+                  {execution.jobName}
+                </Typography>
+                <Chip
+                  icon={statusInfo.icon}
+                  label={statusInfo.label}
+                  color={statusInfo.color}
+                  size="small"
+                />
+              </Box>
+
+              <Grid container spacing={2}>
+                <Grid item xs={6} md={3}>
+                  <Typography variant="caption" color="text.secondary">
+                    Execution ID
+                  </Typography>
+                  <Typography variant="body2" fontWeight="medium">
+                    {execution.executionId}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6} md={3}>
+                  <Typography variant="caption" color="text.secondary">
+                    Job Type
+                  </Typography>
+                  <Typography variant="body2" fontWeight="medium">
+                    {execution.jobType || "N/A"}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6} md={3}>
+                  <Typography variant="caption" color="text.secondary">
+                    Started At
+                  </Typography>
+                  <Typography variant="body2" fontWeight="medium">
+                    {execution.startedAt
+                      ? new Date(execution.startedAt).toLocaleString()
+                      : "Not started"}
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={6} md={3}>
+                  <Typography variant="caption" color="text.secondary">
+                    Duration
+                  </Typography>
+                  <Typography variant="body2" fontWeight="medium">
+                    {execution.durationSeconds
+                      ? `${execution.durationSeconds}s`
+                      : "N/A"}
+                  </Typography>
+                </Grid>
+
+                {execution.host && (
+                  <Grid item xs={6} md={3}>
+                    <Typography variant="caption" color="text.secondary">
+                      Host
+                    </Typography>
+                    <Typography variant="body2" fontWeight="medium">
+                      {execution.host}
+                    </Typography>
+                  </Grid>
+                )}
+
+                {execution.submittedBy && (
+                  <Grid item xs={6} md={3}>
+                    <Typography variant="caption" color="text.secondary">
+                      Submitted By
+                    </Typography>
+                    <Typography variant="body2" fontWeight="medium">
+                      {execution.submittedBy}
+                    </Typography>
+                  </Grid>
+                )}
+              </Grid>
+            </Box>
+          </Box>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderChainTree = (nodes: Array<any>, level: number = 1) => {
+    return nodes.map((node, index) => (
+      <Box key={`${node.execution.executionId}-${index}`}>
+        {renderJobNode(node.execution, level)}
+        {node.children && node.children.length > 0 && (
+          <Box>{renderChainTree(node.children, level + 1)}</Box>
+        )}
+      </Box>
+    ));
+  };
+
+  return (
+    <Box>
+      {/* Root Job */}
+      <Box mb={3}>
+        <Typography variant="h5" gutterBottom>
+          Root Job Chain
+        </Typography>
+        {renderJobNode(rootExecution, 0)}
+      </Box>
+
+      {/* Child Jobs */}
+      {chainTree && chainTree.length > 0 && (
+        <Box>
+          <Typography variant="h5" gutterBottom>
+            Child Jobs
+          </Typography>
+          {renderChainTree(chainTree, 1)}
+        </Box>
+      )}
+
+      {/* Summary */}
+      <Box mt={3} p={2} bgcolor="grey.50" borderRadius={1}>
+        <Typography variant="h6" gutterBottom>
+          Chain Summary
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6} md={3}>
+            <Typography variant="caption" color="text.secondary">
+              Total Jobs
+            </Typography>
+            <Typography variant="h6">
+              {1 + (chainTree ? chainTree.length : 0)}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography variant="caption" color="text.secondary">
+              Root Job
+            </Typography>
+            <Typography variant="body2" fontWeight="medium">
+              {rootExecution.jobName}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={3}>
+            <Typography variant="caption" color="text.secondary">
+              Chain Status
+            </Typography>
+            <Chip
+              icon={getStatusInfo(rootExecution.status).icon}
+              label={getStatusInfo(rootExecution.status).label}
+              color={getStatusInfo(rootExecution.status).color}
+              size="small"
+            />
+          </Grid>
+        </Grid>
+      </Box>
     </Box>
   );
 };
