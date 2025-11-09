@@ -195,24 +195,79 @@ public class CsvImportService {
         latest.getStatus());
   }
 
+  /** Parse a CSV line properly handling quoted values (Excel format) */
+  private String[] parseCsvLineWithQuotes(String line) {
+    List<String> columns = new ArrayList<>();
+    StringBuilder currentColumn = new StringBuilder();
+    boolean insideQuotes = false;
+    int i = 0;
+
+    while (i < line.length()) {
+      char ch = line.charAt(i);
+
+      if (ch == '"') {
+        if (insideQuotes) {
+          // Check for escaped quote (double quotes)
+          if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
+            currentColumn.append('"');
+            i += 2; // Skip both quotes
+            continue;
+          } else {
+            // End of quoted field
+            insideQuotes = false;
+          }
+        } else {
+          // Start of quoted field
+          insideQuotes = true;
+        }
+      } else if (ch == ',' && !insideQuotes) {
+        // End of column
+        columns.add(currentColumn.toString().trim());
+        currentColumn.setLength(0);
+      } else {
+        // Regular character
+        currentColumn.append(ch);
+      }
+
+      i++;
+    }
+
+    // Add the last column
+    columns.add(currentColumn.toString().trim());
+
+    // Convert to array
+    String[] result = columns.toArray(new String[0]);
+
+    // Log parsing result for debugging
+    logger.debug("Parsed CSV line: {} columns from line: {}", result.length, line);
+
+    return result;
+  }
+
   /** Parse a single CSV line into an ImportedJobExecution */
   private ImportedJobExecution parseCsvLine(String line, String sourceFile) {
-    String[] columns = line.split(",");
+    // Handle different line endings (Windows CRLF vs Unix LF)
+    line = line.replaceAll("\\r\\n|\\r|\\n", "").trim();
+
+    // Parse CSV line properly handling quoted values (Windows Excel format)
+    String[] columns = parseCsvLineWithQuotes(line);
 
     if (columns.length < 14) {
-      logger.warn("Invalid CSV line format: insufficient columns");
+      logger.warn(
+          "Invalid CSV line format: insufficient columns ({}), expected 14", columns.length);
       return null;
     }
 
     try {
       ImportedJobExecution execution = new ImportedJobExecution();
 
-      // Parse ID
-      execution.setExecutionId(parseStringToLong(columns[COL_ID].trim()));
+      // Parse ID with better error handling
+      String idString = columns[COL_ID];
+      execution.setExecutionId(parseStringToLong(idString));
 
       // Skip if ID is null or 0
       if (execution.getExecutionId() == null || execution.getExecutionId() == 0) {
-        logger.warn("Invalid execution ID in CSV line: {}", columns[COL_ID]);
+        logger.warn("Invalid execution ID in CSV line: '{}', full line: {}", idString, line);
         return null;
       }
 
