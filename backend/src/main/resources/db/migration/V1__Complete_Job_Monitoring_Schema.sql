@@ -3,7 +3,7 @@
 -- SQLite compatible with comprehensive job monitoring features
 
 -- Users table with RBAC support
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -23,7 +23,7 @@ CREATE TABLE users (
 );
 
 -- Refresh tokens for JWT authentication
-CREATE TABLE refresh_tokens (
+CREATE TABLE IF NOT EXISTS refresh_tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     token VARCHAR(255) NOT NULL UNIQUE,
     user_id INTEGER NOT NULL,
@@ -34,7 +34,7 @@ CREATE TABLE refresh_tokens (
 );
 
 -- Job Monitoring Jobs table - Main job configuration
-CREATE TABLE job_monitor_jobs (
+CREATE TABLE IF NOT EXISTS job_monitor_jobs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(100) NOT NULL,
     description VARCHAR(500),
@@ -62,7 +62,7 @@ CREATE TABLE job_monitor_jobs (
 );
 
 -- Job Executions table - Execution history and tracking
-CREATE TABLE job_executions (
+CREATE TABLE IF NOT EXISTS job_executions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     job_id INTEGER NOT NULL,
     status VARCHAR(20) NOT NULL CHECK (status IN ('QUEUED', 'RUNNING', 'SUCCESS', 'FAILED', 'CANCELLED', 'TIMEOUT', 'RETRYING')),
@@ -88,7 +88,7 @@ CREATE TABLE job_executions (
 );
 
 -- Job Schedules table - Scheduling configuration
-CREATE TABLE job_schedules (
+CREATE TABLE IF NOT EXISTS job_schedules (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     job_id BIGINT NOT NULL UNIQUE,
     cron_expression VARCHAR(100) NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE job_schedules (
 );
 
 -- User favorites (jobs)
-CREATE TABLE user_favorites (
+CREATE TABLE IF NOT EXISTS user_favorites (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     favorite_type VARCHAR(20) NOT NULL CHECK (favorite_type IN ('JOB')),
@@ -126,7 +126,7 @@ CREATE TABLE user_favorites (
 );
 
 -- Notification preferences per user per job
-CREATE TABLE notification_preferences (
+CREATE TABLE IF NOT EXISTS notification_preferences (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     target_type VARCHAR(20) NOT NULL CHECK (target_type IN ('JOB')),
@@ -143,7 +143,7 @@ CREATE TABLE notification_preferences (
 );
 
 -- Audit log for tracking user actions and system events
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,  -- NULL for system events
     action VARCHAR(50) NOT NULL,
