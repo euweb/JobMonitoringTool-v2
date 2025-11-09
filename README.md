@@ -73,6 +73,49 @@ mvn spring-boot:run
 | `user`       | `user123`      | Standard User | Benutzerbereich |
 | `testuser`   | `testpassword` | Standard User | Testing         |
 
+# Backend im Entwicklungs- oder Produktionsmodus starten
+
+Erstelle das Skript `start.sh` im Projekt-Root:
+
+```bash
+#!/bin/bash
+PROFILE=${1:-dev}
+echo "Starte JobMonitoringTool mit Profil: $PROFILE"
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=$PROFILE
+```
+
+**Verwendung:**
+
+```bash
+chmod +x start.sh
+./start.sh dev    # für Entwicklung
+./start.sh prod   # für Produktion
+```
+
+# Backend als ausführbare Jar-Datei bauen und deployen
+
+```bash
+cd backend
+mvn clean package -DskipTests
+```
+
+Die ausführbare Datei findest du unter:
+
+```
+backend/target/JobMonitoringTool-v2-*.jar
+```
+
+**Starten auf einem Rechner mit nur Java:**
+
+```bash
+java -jar target/JobMonitoringTool-v2-*.jar --spring.profiles.active=prod
+```
+
+Alle Bibliotheken sind im Jar enthalten (Spring Boot "fat jar").
+
+---
+
 ## 🔨 Build und Deployment
 
 ### Vollständiger Build
