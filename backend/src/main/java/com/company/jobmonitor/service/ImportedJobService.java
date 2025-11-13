@@ -260,14 +260,31 @@ public class ImportedJobService {
       String status,
       String jobType,
       String host,
-      String submittedBy) {
+      String submittedBy,
+      String submittedAfter,
+      String submittedBefore,
+      String startedAfter,
+      String startedBefore,
+      String endedAfter,
+      String endedBefore) {
 
     org.springframework.data.domain.Pageable pageable =
         org.springframework.data.domain.PageRequest.of(page, size);
 
     Page<ImportedJobExecution> pageResult =
         executionRepository.findExecutionsWithFilters(
-            jobName, status, jobType, host, submittedBy, pageable);
+            jobName,
+            status,
+            jobType,
+            host,
+            submittedBy,
+            submittedAfter,
+            submittedBefore,
+            startedAfter,
+            startedBefore,
+            endedAfter,
+            endedBefore,
+            pageable);
 
     return new PagedResponse<>(
         pageResult.getContent(),

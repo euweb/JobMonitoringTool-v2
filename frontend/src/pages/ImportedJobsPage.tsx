@@ -127,8 +127,16 @@ const ImportedJobsPage: React.FC = () => {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [jobChainData, setJobChainData] = useState<any>(null);
   const [showJobChain, setShowJobChain] = useState(false);
+  const [goToPage, setGoToPage] = useState<string>("");
 
   const queryClient = useQueryClient();
+
+  // Fetch filter options
+  const { data: filterOptions } = useQuery({
+    queryKey: ["filter-options"],
+    queryFn: () => importedJobService.getFilterOptions(),
+    staleTime: 300000, // 5 minutes
+  });
 
   // Fetch executions with pagination and filters
   const {
@@ -227,12 +235,35 @@ const ImportedJobsPage: React.FC = () => {
     [],
   );
 
+  // Handle page jump
+  const handleGoToPage = useCallback(() => {
+    const pageNum = parseInt(goToPage, 10) - 1; // Convert to 0-based
+    if (pageNum >= 0 && pageNum < (executionsPage?.totalPages || 0)) {
+      setPage(pageNum);
+      setGoToPage("");
+    }
+  }, [goToPage, executionsPage?.totalPages]);
+
   // Handle filters
   const handleFilterChange = useCallback(
     (field: keyof ExecutionFilters, value: string) => {
       setFilters((prev) => ({
         ...prev,
         [field]: value || undefined,
+      }));
+      setPage(0); // Reset to first page when filtering
+    },
+    [],
+  );
+
+  // Handle date filter change
+  const handleDateFilterChange = useCallback(
+    (field: keyof ExecutionFilters, value: string) => {
+      // Convert date string to ISO format if needed
+      const isoValue = value ? new Date(value).toISOString() : undefined;
+      setFilters((prev) => ({
+        ...prev,
+        [field]: isoValue,
       }));
       setPage(0); // Reset to first page when filtering
     },
@@ -288,21 +319,6 @@ const ImportedJobsPage: React.FC = () => {
     },
     [],
   );
-
-  // Get unique values for filter dropdowns
-  const uniqueValues = useMemo(() => {
-    if (!executionsPage?.content) return {};
-
-    const content = executionsPage.content;
-    return {
-      statuses: [...new Set(content.map((ex) => ex.status).filter(Boolean))],
-      jobTypes: [...new Set(content.map((ex) => ex.jobType).filter(Boolean))],
-      hosts: [...new Set(content.map((ex) => ex.host).filter(Boolean))],
-      submitters: [
-        ...new Set(content.map((ex) => ex.submittedBy).filter(Boolean)),
-      ],
-    };
-  }, [executionsPage?.content]);
 
   if (error) {
     return (
@@ -405,7 +421,9 @@ const ImportedJobsPage: React.FC = () => {
           <Typography variant="h6" sx={{ mb: 2 }}>
             Filters
           </Typography>
-          <Grid container spacing={2}>
+
+          {/* Basic Filters Row */}
+          <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} md={2}>
               <TextField
                 fullWidth
@@ -424,7 +442,7 @@ const ImportedJobsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange("status", e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {uniqueValues.statuses?.map((status) => (
+                  {filterOptions?.statuses?.map((status) => (
                     <MenuItem key={status} value={status}>
                       {status}
                     </MenuItem>
@@ -443,7 +461,7 @@ const ImportedJobsPage: React.FC = () => {
                   }
                 >
                   <MenuItem value="">All</MenuItem>
-                  {uniqueValues.jobTypes?.map((type) => (
+                  {filterOptions?.jobTypes?.map((type) => (
                     <MenuItem key={type} value={type}>
                       {type}
                     </MenuItem>
@@ -460,7 +478,7 @@ const ImportedJobsPage: React.FC = () => {
                   onChange={(e) => handleFilterChange("host", e.target.value)}
                 >
                   <MenuItem value="">All</MenuItem>
-                  {uniqueValues.hosts?.map((host) => (
+                  {filterOptions?.hosts?.map((host) => (
                     <MenuItem key={host} value={host}>
                       {host}
                     </MenuItem>
@@ -479,7 +497,7 @@ const ImportedJobsPage: React.FC = () => {
                   }
                 >
                   <MenuItem value="">All</MenuItem>
-                  {uniqueValues.submitters?.map((submitter) => (
+                  {filterOptions?.submitters?.map((submitter) => (
                     <MenuItem key={submitter} value={submitter}>
                       {submitter}
                     </MenuItem>
@@ -494,8 +512,121 @@ const ImportedJobsPage: React.FC = () => {
                 onClick={clearFilters}
                 size="small"
               >
-                Clear Filters
+                Clear
               </Button>
+            </Grid>
+          </Grid>
+
+          {/* Date Filters Row */}
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Date Filters
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Submitted After"
+                type="datetime-local"
+                value={
+                  filters.submittedAfter
+                    ? new Date(filters.submittedAfter)
+                        .toISOString()
+                        .slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("submittedAfter", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Submitted Before"
+                type="datetime-local"
+                value={
+                  filters.submittedBefore
+                    ? new Date(filters.submittedBefore)
+                        .toISOString()
+                        .slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("submittedBefore", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Started After"
+                type="datetime-local"
+                value={
+                  filters.startedAfter
+                    ? new Date(filters.startedAfter).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("startedAfter", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Started Before"
+                type="datetime-local"
+                value={
+                  filters.startedBefore
+                    ? new Date(filters.startedBefore).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("startedBefore", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Ended After"
+                type="datetime-local"
+                value={
+                  filters.endedAfter
+                    ? new Date(filters.endedAfter).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("endedAfter", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} md={2}>
+              <TextField
+                fullWidth
+                label="Ended Before"
+                type="datetime-local"
+                value={
+                  filters.endedBefore
+                    ? new Date(filters.endedBefore).toISOString().slice(0, 16)
+                    : ""
+                }
+                onChange={(e) =>
+                  handleDateFilterChange("endedBefore", e.target.value)
+                }
+                size="small"
+                InputLabelProps={{ shrink: true }}
+              />
             </Grid>
           </Grid>
         </CardContent>
@@ -752,15 +883,55 @@ const ImportedJobsPage: React.FC = () => {
 
           {/* Pagination */}
           {executionsPage && (
-            <TablePagination
-              component="div"
-              count={executionsPage.totalElements}
-              page={page}
-              onPageChange={handlePageChange}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleRowsPerPageChange}
-              rowsPerPageOptions={[10, 25, 50, 100]}
-            />
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ p: 2 }}
+            >
+              <TablePagination
+                component="div"
+                count={executionsPage.totalElements}
+                page={page}
+                onPageChange={handlePageChange}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowsPerPageOptions={[10, 25, 50, 100]}
+                sx={{ flex: 1 }}
+              />
+
+              {/* Go to Page */}
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography variant="body2">Go to page:</Typography>
+                <TextField
+                  size="small"
+                  value={goToPage}
+                  onChange={(e) => setGoToPage(e.target.value)}
+                  type="number"
+                  inputProps={{
+                    min: 1,
+                    max: executionsPage.totalPages,
+                    style: { width: "60px", textAlign: "center" },
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      handleGoToPage();
+                    }
+                  }}
+                />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleGoToPage}
+                  disabled={!goToPage}
+                >
+                  Go
+                </Button>
+                <Typography variant="body2" color="text.secondary">
+                  of {executionsPage.totalPages}
+                </Typography>
+              </Stack>
+            </Stack>
           )}
         </CardContent>
       </Card>

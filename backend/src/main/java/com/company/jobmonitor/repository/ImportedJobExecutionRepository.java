@@ -79,13 +79,25 @@ public interface ImportedJobExecutionRepository extends JpaRepository<ImportedJo
           + " (:jobType IS NULL OR LOWER(e.jobType) LIKE LOWER(CONCAT('%', :jobType, '%'))) AND"
           + " (:host IS NULL OR LOWER(e.host) LIKE LOWER(CONCAT('%', :host, '%'))) AND"
           + " (:submittedBy IS NULL OR LOWER(e.submittedBy) LIKE LOWER(CONCAT('%', :submittedBy,"
-          + " '%'))) ORDER BY e.executionId DESC")
+          + " '%'))) AND (:submittedAfter IS NULL OR e.submittedAt >= CAST(:submittedAfter AS"
+          + " timestamp)) AND (:submittedBefore IS NULL OR e.submittedAt <= CAST(:submittedBefore"
+          + " AS timestamp)) AND (:startedAfter IS NULL OR e.startedAt >= CAST(:startedAfter AS"
+          + " timestamp)) AND (:startedBefore IS NULL OR e.startedAt <= CAST(:startedBefore AS"
+          + " timestamp)) AND (:endedAfter IS NULL OR e.endedAt >= CAST(:endedAfter AS timestamp))"
+          + " AND (:endedBefore IS NULL OR e.endedAt <= CAST(:endedBefore AS timestamp)) ORDER BY"
+          + " e.executionId DESC")
   org.springframework.data.domain.Page<ImportedJobExecution> findExecutionsWithFilters(
       @Param("jobName") String jobName,
       @Param("status") String status,
       @Param("jobType") String jobType,
       @Param("host") String host,
       @Param("submittedBy") String submittedBy,
+      @Param("submittedAfter") String submittedAfter,
+      @Param("submittedBefore") String submittedBefore,
+      @Param("startedAfter") String startedAfter,
+      @Param("startedBefore") String startedBefore,
+      @Param("endedAfter") String endedAfter,
+      @Param("endedBefore") String endedBefore,
       org.springframework.data.domain.Pageable pageable);
 
   /** Get distinct values for filter dropdowns */

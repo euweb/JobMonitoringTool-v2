@@ -65,6 +65,12 @@ export interface ExecutionFilters {
   jobType?: string;
   host?: string;
   submittedBy?: string;
+  submittedAfter?: string;
+  submittedBefore?: string;
+  startedAfter?: string;
+  startedBefore?: string;
+  endedAfter?: string;
+  endedBefore?: string;
 }
 
 /**
@@ -89,10 +95,30 @@ export class ImportedJobService {
     if (filters?.jobType) params.jobType = filters.jobType;
     if (filters?.host) params.host = filters.host;
     if (filters?.submittedBy) params.submittedBy = filters.submittedBy;
+    if (filters?.submittedAfter) params.submittedAfter = filters.submittedAfter;
+    if (filters?.submittedBefore)
+      params.submittedBefore = filters.submittedBefore;
+    if (filters?.startedAfter) params.startedAfter = filters.startedAfter;
+    if (filters?.startedBefore) params.startedBefore = filters.startedBefore;
+    if (filters?.endedAfter) params.endedAfter = filters.endedAfter;
+    if (filters?.endedBefore) params.endedBefore = filters.endedBefore;
 
     const response = await apiClient.get("/imported-jobs/executions", {
       params,
     });
+    return response.data;
+  }
+
+  /**
+   * Get filter options for dropdowns
+   */
+  async getFilterOptions(): Promise<{
+    statuses: string[];
+    jobTypes: string[];
+    hosts: string[];
+    submitters: string[];
+  }> {
+    const response = await apiClient.get("/imported-jobs/executions/filters");
     return response.data;
   }
 

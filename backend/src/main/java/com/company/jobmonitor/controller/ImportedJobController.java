@@ -58,10 +58,29 @@ public class ImportedJobController {
       @RequestParam(required = false) String status,
       @RequestParam(required = false) String jobType,
       @RequestParam(required = false) String host,
-      @RequestParam(required = false) String submittedBy) {
+      @RequestParam(required = false) String submittedBy,
+      @RequestParam(required = false) String submittedAfter,
+      @RequestParam(required = false) String submittedBefore,
+      @RequestParam(required = false) String startedAfter,
+      @RequestParam(required = false) String startedBefore,
+      @RequestParam(required = false) String endedAfter,
+      @RequestParam(required = false) String endedBefore) {
 
     PagedResponse<ImportedJobExecution> executions =
-        importedJobService.getExecutions(page, size, jobName, status, jobType, host, submittedBy);
+        importedJobService.getExecutions(
+            page,
+            size,
+            jobName,
+            status,
+            jobType,
+            host,
+            submittedBy,
+            submittedAfter,
+            submittedBefore,
+            startedAfter,
+            startedBefore,
+            endedAfter,
+            endedBefore);
 
     return ResponseEntity.ok(executions);
   }
