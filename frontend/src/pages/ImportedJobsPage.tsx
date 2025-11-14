@@ -426,7 +426,7 @@ const ImportedJobsPage: React.FC = () => {
         <Typography variant="h4" component="h1">
           Imported Job Executions
         </Typography>
-        <Stack direction="row" spacing={2}>
+        {/* <Stack direction="row" spacing={2}>
           <Button
             variant="outlined"
             startIcon={<RefreshIcon />}
@@ -443,7 +443,7 @@ const ImportedJobsPage: React.FC = () => {
           >
             Trigger Import
           </Button>
-        </Stack>
+        </Stack> */}
       </Box>
 
       {/* Quick Stats */}
