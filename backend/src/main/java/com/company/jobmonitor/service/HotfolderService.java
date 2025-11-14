@@ -159,6 +159,9 @@ public class HotfolderService {
         logger.info("Hotfolder monitoring interrupted");
         Thread.currentThread().interrupt();
         break;
+      } catch (java.nio.file.ClosedWatchServiceException e) {
+        logger.info("Hotfolder monitoring stopped due to WatchService closure.");
+        break;
       } catch (Exception e) {
         logger.error("Error in hotfolder monitoring", e);
         // Continue monitoring even if individual file processing fails
