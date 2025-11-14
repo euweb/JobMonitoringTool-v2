@@ -66,7 +66,7 @@ import {
 /**
  * Status color and icon mapping
  */
-const getStatusInfo = (status: string | undefined) => {
+export const getStatusInfo = (status: string | undefined) => {
   switch (status) {
     case "DONE":
       return {
