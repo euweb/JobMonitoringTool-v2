@@ -81,10 +81,14 @@ spring:
 
 # Logging Configuration
 logging:
+  file:
+    name: logs/jobmonitor.log
   level:
+    root: WARN
     com.company.jobmonitor: DEBUG
-    org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -150,9 +154,12 @@ spring:
       enabled: true
 
 logging:
+  file:
+    name: logs/jobmonitor.log
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    root: WARN
+    org.hibernate.SQL: OFF
+    org.hibernate.type.descriptor.sql.BasicBinder: OFF
 ---
 # Production Profile
 spring:
