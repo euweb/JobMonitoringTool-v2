@@ -139,10 +139,29 @@ const formatTimestamp = (timestamp?: string): string => {
  * Main ImportedJobsPage component
  */
 const ImportedJobsPage: React.FC = () => {
-  // State management
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [filters, setFilters] = useState<ExecutionFilters>({});
+  // State management mit LocalStorage
+  const LOCAL_KEY = "importedJobsPageState";
+  const getInitialState = () => {
+    try {
+      const raw = localStorage.getItem(LOCAL_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          page: parsed.page ?? 0,
+          rowsPerPage: parsed.rowsPerPage ?? 25,
+          filters: parsed.filters ?? {},
+        };
+      }
+    } catch {}
+    return { page: 0, rowsPerPage: 25, filters: {} };
+  };
+  const [page, setPage] = useState<number>(getInitialState().page);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(
+    getInitialState().rowsPerPage,
+  );
+  const [filters, setFilters] = useState<ExecutionFilters>(
+    getInitialState().filters,
+  );
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [jobChainData, setJobChainData] = useState<any>(null);
@@ -245,12 +264,30 @@ const ImportedJobsPage: React.FC = () => {
   // Handle pagination
   const handlePageChange = useCallback((event: unknown, newPage: number) => {
     setPage(newPage);
+    // Speichere im LocalStorage
+    localStorage.setItem(
+      LOCAL_KEY,
+      JSON.stringify({
+        page: newPage,
+        rowsPerPage,
+        filters,
+      }),
+    );
   }, []);
 
   const handleRowsPerPageChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
+      const newRows = parseInt(event.target.value, 10);
+      setRowsPerPage(newRows);
       setPage(0);
+      localStorage.setItem(
+        LOCAL_KEY,
+        JSON.stringify({
+          page: 0,
+          rowsPerPage: newRows,
+          filters,
+        }),
+      );
     },
     [],
   );
@@ -267,10 +304,18 @@ const ImportedJobsPage: React.FC = () => {
   // Handle filters
   const handleFilterChange = useCallback(
     (field: keyof ExecutionFilters, value: string) => {
-      setFilters((prev) => ({
-        ...prev,
-        [field]: value || undefined,
-      }));
+      setFilters((prev) => {
+        const newFilters = { ...prev, [field]: value || undefined };
+        localStorage.setItem(
+          LOCAL_KEY,
+          JSON.stringify({
+            page: 0,
+            rowsPerPage,
+            filters: newFilters,
+          }),
+        );
+        return newFilters;
+      });
       setPage(0); // Reset to first page when filtering
     },
     [],
@@ -281,10 +326,18 @@ const ImportedJobsPage: React.FC = () => {
     (field: keyof ExecutionFilters, value: string) => {
       // Sende die Zeit exakt wie eingegeben (ohne Manipulation) an das Backend
       const isoValue = value || undefined;
-      setFilters((prev) => ({
-        ...prev,
-        [field]: isoValue,
-      }));
+      setFilters((prev) => {
+        const newFilters = { ...prev, [field]: isoValue };
+        localStorage.setItem(
+          LOCAL_KEY,
+          JSON.stringify({
+            page: 0,
+            rowsPerPage,
+            filters: newFilters,
+          }),
+        );
+        return newFilters;
+      });
       setPage(0); // Reset to first page when filtering
     },
     [],
@@ -294,6 +347,14 @@ const ImportedJobsPage: React.FC = () => {
   const clearFilters = useCallback(() => {
     setFilters({});
     setPage(0);
+    localStorage.setItem(
+      LOCAL_KEY,
+      JSON.stringify({
+        page: 0,
+        rowsPerPage,
+        filters: {},
+      }),
+    );
   }, []);
 
   // Toggle row expansion
