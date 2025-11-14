@@ -66,6 +66,14 @@ public class ImportedJobController {
       @RequestParam(required = false) String endedAfter,
       @RequestParam(required = false) String endedBefore) {
 
+    // ISO-Strings in LocalDateTime parsen
+    java.time.LocalDateTime submittedAfterDt = parseDateTime(submittedAfter);
+    java.time.LocalDateTime submittedBeforeDt = parseDateTime(submittedBefore);
+    java.time.LocalDateTime startedAfterDt = parseDateTime(startedAfter);
+    java.time.LocalDateTime startedBeforeDt = parseDateTime(startedBefore);
+    java.time.LocalDateTime endedAfterDt = parseDateTime(endedAfter);
+    java.time.LocalDateTime endedBeforeDt = parseDateTime(endedBefore);
+
     PagedResponse<ImportedJobExecution> executions =
         importedJobService.getExecutions(
             page,
@@ -75,14 +83,23 @@ public class ImportedJobController {
             jobType,
             host,
             submittedBy,
-            submittedAfter,
-            submittedBefore,
-            startedAfter,
-            startedBefore,
-            endedAfter,
-            endedBefore);
+            submittedAfterDt,
+            submittedBeforeDt,
+            startedAfterDt,
+            startedBeforeDt,
+            endedAfterDt,
+            endedBeforeDt);
 
     return ResponseEntity.ok(executions);
+  }
+
+  private java.time.LocalDateTime parseDateTime(String isoString) {
+    if (isoString == null || isoString.isEmpty()) return null;
+    try {
+      return java.time.LocalDateTime.parse(isoString.replace("Z", ""));
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /** Get filter options for dropdowns */

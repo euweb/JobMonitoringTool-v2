@@ -112,7 +112,27 @@ const formatDuration = (seconds?: number): string => {
  */
 const formatTimestamp = (timestamp?: string): string => {
   if (!timestamp) return "-";
-  return new Date(timestamp).toLocaleString();
+  // ISO-String als lokale Zeit anzeigen, unabhängig von Browser-Interpretation
+  const [date, time] = timestamp.split("T");
+  if (!date || !time) return timestamp;
+  const [year, month, day] = date.split("-");
+  const [hour, minute, rest] = time.split(":");
+  let second = 0;
+  if (rest) {
+    second = Number(rest.split(".")[0]);
+  }
+  // Date.UTC erzeugt ein UTC-Datum, das wir als lokale Zeit anzeigen
+  const localDate = new Date(
+    Date.UTC(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hour),
+      Number(minute),
+      second,
+    ),
+  );
+  return localDate.toLocaleString();
 };
 
 /**
@@ -259,8 +279,8 @@ const ImportedJobsPage: React.FC = () => {
   // Handle date filter change
   const handleDateFilterChange = useCallback(
     (field: keyof ExecutionFilters, value: string) => {
-      // Convert date string to ISO format if needed
-      const isoValue = value ? new Date(value).toISOString() : undefined;
+      // Sende die Zeit exakt wie eingegeben (ohne Manipulation) an das Backend
+      const isoValue = value || undefined;
       setFilters((prev) => ({
         ...prev,
         [field]: isoValue,
@@ -527,13 +547,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Submitted After"
                 type="datetime-local"
-                value={
-                  filters.submittedAfter
-                    ? new Date(filters.submittedAfter)
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
+                value={filters.submittedAfter || ""}
                 onChange={(e) =>
                   handleDateFilterChange("submittedAfter", e.target.value)
                 }
@@ -546,13 +560,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Submitted Before"
                 type="datetime-local"
-                value={
-                  filters.submittedBefore
-                    ? new Date(filters.submittedBefore)
-                        .toISOString()
-                        .slice(0, 16)
-                    : ""
-                }
+                value={filters.submittedBefore || ""}
                 onChange={(e) =>
                   handleDateFilterChange("submittedBefore", e.target.value)
                 }
@@ -565,11 +573,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Started After"
                 type="datetime-local"
-                value={
-                  filters.startedAfter
-                    ? new Date(filters.startedAfter).toISOString().slice(0, 16)
-                    : ""
-                }
+                value={filters.startedAfter || ""}
                 onChange={(e) =>
                   handleDateFilterChange("startedAfter", e.target.value)
                 }
@@ -582,11 +586,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Started Before"
                 type="datetime-local"
-                value={
-                  filters.startedBefore
-                    ? new Date(filters.startedBefore).toISOString().slice(0, 16)
-                    : ""
-                }
+                value={filters.startedBefore || ""}
                 onChange={(e) =>
                   handleDateFilterChange("startedBefore", e.target.value)
                 }
@@ -599,11 +599,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Ended After"
                 type="datetime-local"
-                value={
-                  filters.endedAfter
-                    ? new Date(filters.endedAfter).toISOString().slice(0, 16)
-                    : ""
-                }
+                value={filters.endedAfter || ""}
                 onChange={(e) =>
                   handleDateFilterChange("endedAfter", e.target.value)
                 }
@@ -616,11 +612,7 @@ const ImportedJobsPage: React.FC = () => {
                 fullWidth
                 label="Ended Before"
                 type="datetime-local"
-                value={
-                  filters.endedBefore
-                    ? new Date(filters.endedBefore).toISOString().slice(0, 16)
-                    : ""
-                }
+                value={filters.endedBefore || ""}
                 onChange={(e) =>
                   handleDateFilterChange("endedBefore", e.target.value)
                 }

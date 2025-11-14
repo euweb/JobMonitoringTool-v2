@@ -261,12 +261,12 @@ public class ImportedJobService {
       String jobType,
       String host,
       String submittedBy,
-      String submittedAfter,
-      String submittedBefore,
-      String startedAfter,
-      String startedBefore,
-      String endedAfter,
-      String endedBefore) {
+      java.time.LocalDateTime submittedAfter,
+      java.time.LocalDateTime submittedBefore,
+      java.time.LocalDateTime startedAfter,
+      java.time.LocalDateTime startedBefore,
+      java.time.LocalDateTime endedAfter,
+      java.time.LocalDateTime endedBefore) {
 
     org.springframework.data.domain.Pageable pageable =
         org.springframework.data.domain.PageRequest.of(page, size);
