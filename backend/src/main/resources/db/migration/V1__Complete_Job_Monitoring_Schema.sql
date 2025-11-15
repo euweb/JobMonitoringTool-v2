@@ -22,17 +22,6 @@ CREATE TABLE IF NOT EXISTS users (
     version INTEGER NOT NULL DEFAULT 0
 );
 
--- Refresh tokens for JWT authentication
-CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    token VARCHAR(255) NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL,
-    expires_at DATETIME NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    revoked BOOLEAN NOT NULL DEFAULT FALSE,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-);
-
 -- Job Monitoring Jobs table - Main job configuration
 CREATE TABLE IF NOT EXISTS job_monitor_jobs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,29 +131,10 @@ CREATE TABLE IF NOT EXISTS notification_preferences (
     UNIQUE (user_id, target_type, target_id)
 );
 
--- Audit log for tracking user actions and system events
-CREATE TABLE IF NOT EXISTS audit_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,  -- NULL for system events
-    action VARCHAR(50) NOT NULL,
-    entity_type VARCHAR(50),
-    entity_id VARCHAR(100),
-    old_values TEXT,  -- JSON object
-    new_values TEXT,  -- JSON object
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
-);
-
 -- Indexes for performance
 CREATE INDEX idx_users_username ON users (username);
 CREATE INDEX idx_users_email ON users (email);
 CREATE INDEX idx_users_role ON users (role);
-
-CREATE INDEX idx_refresh_tokens_token ON refresh_tokens (token);
-CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens (user_id);
-CREATE INDEX idx_refresh_tokens_expires_at ON refresh_tokens (expires_at);
 
 CREATE INDEX idx_job_monitor_jobs_status ON job_monitor_jobs (status);
 CREATE INDEX idx_job_monitor_jobs_job_type ON job_monitor_jobs (job_type);
@@ -185,10 +155,6 @@ CREATE INDEX idx_user_favorites_type_id ON user_favorites (favorite_type, favori
 
 CREATE INDEX idx_notification_prefs_user_id ON notification_preferences (user_id);
 CREATE INDEX idx_notification_prefs_target ON notification_preferences (target_type, target_id);
-
-CREATE INDEX idx_audit_logs_user_id ON audit_logs (user_id);
-CREATE INDEX idx_audit_logs_entity ON audit_logs (entity_type, entity_id);
-CREATE INDEX idx_audit_logs_created_at ON audit_logs (created_at);
 
 -- Sample data for testing
 
