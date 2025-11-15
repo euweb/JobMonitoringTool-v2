@@ -187,15 +187,6 @@ const JobsPage: React.FC = () => {
                               </Typography>
                             </Box>
                           )}
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mt: 1 }}
-                          >
-                            Executions: {favorite.totalExecutions} | Success:{" "}
-                            {favorite.successCount} | Failed:{" "}
-                            {favorite.failureCount}
-                          </Typography>
                         </Box>
                         <Box display="flex" flexDirection="column" gap={1}>
                           <Tooltip
