@@ -24,7 +24,7 @@ app:
     from-email: dev@jobmonitor.local
     subject-prefix: "[Job Monitor DEV]"
     # Mock mode for development - logs emails instead of sending
-    mock-mode: true
+    mock-mode: false
 
   # Hotfolder Configuration for Development
   hotfolder:
