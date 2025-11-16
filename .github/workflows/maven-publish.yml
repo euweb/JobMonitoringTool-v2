@@ -10,6 +10,9 @@ on:
 jobs:
   build-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,11 +32,11 @@ jobs:
         with:
           files: backend/target/*.jar
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Upload JAR as Artifact
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: fat-jar
+          name: release-jar
           path: backend/target/*.jar
