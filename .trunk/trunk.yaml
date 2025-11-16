@@ -7,7 +7,7 @@ cli:
 plugins:
   sources:
     - id: trunk
-      ref: v1.7.3
+      ref: v1.7.4
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
@@ -19,15 +19,15 @@ runtimes:
 
 # This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
 lint:
+  disabled:
+    - pmd
   enabled:
     # Java
-    - checkov@3.2.490
+    - actionlint@1.7.8
+    - checkov@3.2.493
     - osv-scanner@2.2.4
-    - trufflehog@3.90.13
+    - trufflehog@3.91.0
     - google-java-format@1.32.0
-    - pmd@pmd_releases/7.18.0
-
-    # TypeScript/JavaScript
     - eslint@9.39.1
     - prettier@3.6.2
 
