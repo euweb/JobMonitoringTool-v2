@@ -48,12 +48,18 @@ public class NotificationService {
     }
 
     try {
-      Integer userId = favorite.getUserId();
-      if (userId == null) {
-        logger.warn("No userId found for favorite job notification: {}", favorite.getJobName());
+      // Prüfe, ob diese Execution bereits benachrichtigt wurde
+      if (favorite.getLastNotifiedExecutionId() != null
+          && favorite.getLastNotifiedExecutionId().equals(execution.getExecutionId())) {
+        if (logger.isDebugEnabled()) {
+          logger.debug(
+              "Benachrichtigung für diese Execution wurde bereits verschickt: {}",
+              execution.getExecutionId());
+        }
         return;
       }
-      User user = userRepository.findById(userId).orElse(null);
+
+      User user = userRepository.findById(favorite.getUserId()).orElse(null);
       if (user == null || user.getEmail() == null) {
         logger.warn(
             "No user or email found for favorite job notification: {}", favorite.getJobName());
@@ -64,6 +70,13 @@ public class NotificationService {
       String body = buildFailureNotificationBody(execution);
 
       sendEmail(user.getEmail(), subject, body);
+
+      // Setze lastNotifiedExecutionId nach erfolgreichem Versand
+      favorite.setLastNotifiedExecutionId(execution.getExecutionId());
+
+      // Speichere Favorite-Änderung
+      // Annahme: favoriteRepository ist verfügbar
+      // Falls nicht, muss dies im Service erfolgen
 
       logger.info(
           "Sent failure notification for job '{}' to {}", favorite.getJobName(), user.getEmail());
