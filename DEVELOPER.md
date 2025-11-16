@@ -30,6 +30,12 @@ cd backend
 mvn spring-boot:run
 ```
 
+oder mit dev-Profil
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
 **Backend läuft auf:** http://localhost:8080
 
 **Features im Dev-Modus:**
@@ -64,6 +70,14 @@ npm run build
 - ✅ **TypeScript Checking** in Echtzeit
 - ✅ **ESLint Integration** für Code-Qualität
 - ✅ **Proxy zu Backend** für API-Calls (automatisch konfiguriert)
+
+### Mail-Versand testen
+
+```bash
+docker run -d -p 2525:1025 -p 8025:8025 mailhog/mailhog
+```
+
+Im Browser [Mailhog](http://localhost:8025/#) aufrufen
 
 ### 🔥 Live Development Workflow
 
@@ -330,6 +344,10 @@ git commit -m "feat: add new feature"
 
 # Push und Pull Request
 git push origin feature/your-feature-name
+
+# Tags erstellen
+git tag v1.1.1
+git push origin v1.1.1
 ```
 
 ## 🔍 Troubleshooting
