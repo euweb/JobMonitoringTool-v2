@@ -48,7 +48,12 @@ public class NotificationService {
     }
 
     try {
-      User user = userRepository.findById(favorite.getUserId()).orElse(null);
+      Integer userId = favorite.getUserId();
+      if (userId == null) {
+        logger.warn("No userId found for favorite job notification: {}", favorite.getJobName());
+        return;
+      }
+      User user = userRepository.findById(userId).orElse(null);
       if (user == null || user.getEmail() == null) {
         logger.warn(
             "No user or email found for favorite job notification: {}", favorite.getJobName());

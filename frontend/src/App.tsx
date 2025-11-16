@@ -10,8 +10,6 @@ const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const AdminPanel = React.lazy(() => import("./pages/AdminPanel"));
 const UserSettings = React.lazy(() => import("./pages/UserSettings"));
 const JobsPage = React.lazy(() => import("./pages/JobsPage"));
-const JobDetailsPage = React.lazy(() => import("./pages/JobDetailsPage"));
-const JobFormPage = React.lazy(() => import("./pages/JobFormPage"));
 const ImportedJobsPage = React.lazy(() => import("./pages/ImportedJobsPage"));
 
 const App: React.FC = () => {
@@ -34,9 +32,6 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/jobs" element={<JobsPage />} />
-          <Route path="/jobs/new" element={<JobFormPage />} />
-          <Route path="/jobs/:id" element={<JobDetailsPage />} />
-          <Route path="/jobs/:id/edit" element={<JobFormPage />} />
           <Route path="/imported-jobs" element={<ImportedJobsPage />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/settings" element={<UserSettings />} />

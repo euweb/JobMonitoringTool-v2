@@ -10,6 +10,10 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <skip.frontend>false</skip.frontend>
+    </properties>
+
     <artifactId>job-monitoring-backend</artifactId>
     <packaging>jar</packaging>
 
@@ -153,6 +157,7 @@
                 <configuration>
                     <workingDirectory>../frontend</workingDirectory>
                     <installDirectory>target</installDirectory>
+                    <skip>${skip.frontend}</skip>
                 </configuration>
                 <executions>
                     <!-- Install Node.js and npm -->
@@ -165,6 +170,7 @@
                         <configuration>
                             <nodeVersion>v20.10.0</nodeVersion>
                             <npmVersion>10.2.3</npmVersion>
+                            <skip>${skip.frontend}</skip>
                         </configuration>
                     </execution>
 
@@ -189,6 +195,7 @@
                         </goals>
                         <configuration>
                             <arguments>run clean</arguments>
+                            <skip>${skip.frontend}</skip>
                         </configuration>
                     </execution>
 
@@ -201,6 +208,7 @@
                         </goals>
                         <configuration>
                             <arguments>run build:maven</arguments>
+                            <skip>${skip.frontend}</skip>
                         </configuration>
                     </execution>
                 </executions>
@@ -228,6 +236,7 @@
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>
+                            <skip>${skip.frontend}</skip>
                         </configuration>
                     </execution>
                 </executions>
